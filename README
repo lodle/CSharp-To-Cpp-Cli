@@ -2,21 +2,132 @@ This creates a native wrapper around managed C# classes using C++/Cli.
 
 Include a reference to CSharpToCpp.DLL and mark the classes you want exposed using the ExposeToCpp Attribute.
 
-For Example:
-
-    [ExposeToCpp]
-    public class TestClass : BaseClass
-    {
-        public String ClassName { get; set; }
-        public int ClassCount { get; set; }
-
-        public TestClass()
-        {
-        }
-	}
-	
-	
 Then run CSharpToCppGenerator pointed at your Dll and it will parse it generating the files you need to complie 
 into a c++/cli dll.
 
 Works with String and native types (int, double, bool). Support for List and Dictonary soon.
+
+For Example:
+
+[ExposeToCpp]
+public class TestClass
+{
+	public String ClassName { get; set; }
+	public int ClassCount { get; set; }
+
+	public TestClass()
+	{
+	}
+}
+	
+	
+Produces:
+
+////////////////////////////// Header //////////////////////////////
+#pragma once
+#include "BaseClass.h"
+
+#ifndef DLLFN
+	#ifndef DLL_EXPORT
+		#define DLLFN __declspec( dllimport )
+	#else
+		#define DLLFN __declspec( dllexport )
+	#endif
+#endif
+
+
+class TestClassI
+{
+public:
+	virtual void GetClassName(char* szOutBuff, size_t nOutBuffSize)=0;
+	virtual void SetClassName(const char* _ClassName)=0;
+
+	virtual int GetClassCount()=0;
+	virtual void SetClassCount(int _ClassCount)=0;
+
+	virtual int GetInt()=0;
+
+	virtual void ToString(char* szOutBuff, size_t nOutBuffSize)=0;
+
+	virtual int GetHashCode()=0;
+};
+
+extern "C"
+{
+	DLLFN TestClassI* NewTestClass();
+
+#ifdef DLL_EXPORT
+	TestClassI* NewTestClassCPP(CSharpTestLib::TestClass^ _Internal);
+#endif
+}
+
+
+////////////////////////////// CPP#define DLL_EXPORT
+#include "TestClass.h"
+
+using namespace CSharpTestLib;
+
+class TestClassCPP : public TestClassI
+{
+public:
+	TestClassCPP(TestClass^ _Internal) { m_TestClass = _Internal; }
+
+	virtual void GetClassName(char* szOutBuff, size_t nOutBuffSize)
+	{
+		System::String^ ret = m_TestClass->ClassName;
+		std::string szRet = marshal_as<std::string>(ret);
+		strncpy_s(szOutBuff, nOutBuffSize, szRet.c_str(), szRet.size());
+	}
+
+	virtual void SetClassName(const char* _ClassName)
+	{
+		m_TestClass->ClassName = gcnew System::String(_ClassName);
+	}
+
+	virtual int GetClassCount()
+	{
+		return m_TestClass->ClassCount;
+	}
+
+	virtual void SetClassCount(int _ClassCount)
+	{
+		m_TestClass->ClassCount = _ClassCount;
+	}
+
+	virtual int GetInt()
+	{
+		return m_TestClass->GetInt();
+	}
+
+	virtual void ToString(char* szOutBuff, size_t nOutBuffSize)
+	{
+		System::String^ ret = m_TestClass->ToString();
+		std::string szRet = marshal_as<std::string>(ret);
+		strncpy_s(szOutBuff, nOutBuffSize, szRet.c_str(), szRet.size());
+	}
+
+	virtual int GetHashCode()
+	{
+		return m_TestClass->GetHashCode();
+	}
+
+	TestClass^ InternalObject(){return m_TestClass;}
+	virtual void Destroy(){delete this;}
+
+private:
+	gcroot<TestClass^> m_TestClass;
+};
+
+extern "C"
+{
+	DLLFN TestClassI* NewTestClass()
+	{
+		return new TestClassCPP();
+	}
+
+	TestClassI* NewTestClassCPP(TestClass^ _Internal)
+	{
+		return new TestClassCPP(_Internal);
+	}
+}
+ //////////////////////////////
