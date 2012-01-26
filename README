@@ -73,6 +73,7 @@ using namespace CSharpTestLib;
 class TestClassCPP : public TestClassI
 {
 public:
+	TestClassCPP() { m_TestClass = gcnew TestClass(); }
 	TestClassCPP(TestClass^ _Internal) { m_TestClass = _Internal; }
 
 	virtual void GetClassName(char* szOutBuff, size_t nOutBuffSize)

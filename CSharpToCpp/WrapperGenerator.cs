@@ -274,6 +274,7 @@ namespace CSharpToCpp
             body.WriteLine("{");
             body.WriteLine("public:");
 
+            body.WriteLine("\t{0}CPP() {{ m_{0} = gcnew {0}(); }}", type.Name);
             body.WriteLine("\t{0}CPP({0}^ _Internal) {{ m_{0} = _Internal; }}", type.Name);
             body.WriteLine();
 
