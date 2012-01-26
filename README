@@ -24,6 +24,7 @@ public class TestClass
 Produces:
 
 ////////////////////////////// Header //////////////////////////////
+
 #pragma once
 #include "BaseClass.h"
 
@@ -62,7 +63,9 @@ extern "C"
 }
 
 
-////////////////////////////// CPP#define DLL_EXPORT
+////////////////////////////// CPP //////////////////////////////
+
+#define DLL_EXPORT
 #include "TestClass.h"
 
 using namespace CSharpTestLib;
