@@ -1,0 +1,22 @@
+This creates a native wrapper around managed C# classes using C++/Cli.
+
+Include a reference to CSharpToCpp.DLL and mark the classes you want exposed using the ExposeToCpp Attribute.
+
+For Example:
+
+    [ExposeToCpp]
+    public class TestClass : BaseClass
+    {
+        public String ClassName { get; set; }
+        public int ClassCount { get; set; }
+
+        public TestClass()
+        {
+        }
+	}
+	
+	
+Then run CSharpToCppGenerator pointed at your Dll and it will parse it generating the files you need to complie 
+into a c++/cli dll.
+
+Works with String and native types (int, double, bool). Support for List and Dictonary soon.
