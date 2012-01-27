@@ -13,7 +13,15 @@ namespace CSharpToCppGenerator
     {
         static void Main(string[] args)
         {
-            WrapperGenerator gen = new WrapperGenerator { OutPath = "wrapper", DynamicLib = "CSharpTestLib.dll" };
+            if (args.Count() < 2)
+            {
+                Console.WriteLine("C# to C++ Generator. Copyright Mark Chandler 2012");
+                Console.WriteLine("Usage:");
+                Console.WriteLine("\tCSharpToCppGenerator.exe [Assembly] [OutDir]");
+                return;
+            }
+
+            WrapperGenerator gen = new WrapperGenerator { OutPath = args[1], DynamicLib = args[0] };
 
             foreach (var type in gen.GetTypesWith<ExposeToCppAttribute>())
             {

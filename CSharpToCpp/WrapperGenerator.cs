@@ -24,8 +24,10 @@ namespace CSharpToCpp
 
             _GeneratedList.Add(type);
 
-            Directory.CreateDirectory(OutPath);
-            String destPath = OutPath + "\\" + type.Name + ".h";
+            Directory.CreateDirectory(OutPath + "\\code");
+            Directory.CreateDirectory(OutPath + "\\include");
+
+            String destPath = OutPath + "\\code\\" + type.Name + ".h";
 
 
             using (TextWriter header = new StreamWriter(destPath))
@@ -33,7 +35,14 @@ namespace CSharpToCpp
                 GenerateHeader(type, header);
             }
 
-            destPath = OutPath + "\\" + type.Name + ".cpp";
+            destPath = OutPath + "\\include\\" + type.Name + "I.h";
+
+            using (TextWriter header = new StreamWriter(destPath))
+            {
+                GenerateInterface(type, header);
+            }
+
+            destPath = OutPath + "\\code\\" + type.Name + ".cpp";
 
             using (TextWriter body = new StreamWriter(destPath))
             {
@@ -41,7 +50,7 @@ namespace CSharpToCpp
             }
         }
 
-        private void GenerateHeader(Type type, TextWriter header)
+        private void GenerateInterface(Type type, TextWriter header)
         {
             header.WriteLine("#pragma once");
 
@@ -49,7 +58,7 @@ namespace CSharpToCpp
 
             foreach (var usedType in usedTypes)
             {
-                header.WriteLine(String.Format("#include \"{0}.h\"", usedType.Name));
+                header.WriteLine(String.Format("#include \"{0}I.h\"", usedType.Name));
                 Generate(type.BaseType);
             }
 
@@ -93,9 +102,10 @@ namespace CSharpToCpp
             header.WriteLine("extern \"C\"");
             header.WriteLine("{");
 
+            int nCount = 0;
             foreach (var function in type.GetConstructors(BindingFlags.Public | BindingFlags.Instance))
             {
-                header.Write(String.Format("\tDLLFN {0}I* New{0}(", type.Name));
+                header.Write(String.Format("\tDLLFN {0}I* New{0}{1}(", type.Name, (nCount > 0) ? nCount.ToString() : ""));
 
                 bool first = true;
                 foreach (var paramater in function.GetParameters())
@@ -108,6 +118,7 @@ namespace CSharpToCpp
                 }
 
                 header.WriteLine(");");
+                nCount++;
             }
 
             header.WriteLine("");
@@ -118,12 +129,70 @@ namespace CSharpToCpp
                 header.WriteLine(";");
             }
 
-            header.WriteLine();
-            header.WriteLine("#ifdef DLL_EXPORT");
-            header.WriteLine("\t{0}I* New{0}CPP({1}^ _Internal);", type.Name, type.FullName.Replace(".", "::"));
-            header.WriteLine("#endif");
+            header.WriteLine("}");           
+        }
 
-            header.WriteLine("}");
+        private void GenerateHeader(Type type, TextWriter header)
+        {
+            header.WriteLine("#pragma once");
+
+            String NameSpace = type.FullName.Substring(0, type.FullName.LastIndexOf('.'));
+            NameSpace.Replace(".", "::");
+
+            header.WriteLine("using namespace {0};", NameSpace);
+            header.WriteLine();
+
+            header.WriteLine(String.Format("#include \"{0}I.h\"", type.Name));
+            header.WriteLine(String.Format("#include <msclr\\gcroot.h>", type.Name));
+
+            List<Type> usedTypes = GetAllUsedTypes(type);
+
+            foreach (var usedType in usedTypes)
+            {
+                header.WriteLine(String.Format("#include \"{0}.h\"", usedType.Name));
+                Generate(type.BaseType);
+            }
+
+            header.Write("\n\n");
+            header.Write(String.Format("class {0}CPP : public virtual {0}I", type.Name));
+
+            if (type.BaseType != typeof(Object))
+                header.WriteLine(String.Format(", public {0}CPP", type.BaseType.Name));
+            else
+                header.WriteLine();
+
+            header.WriteLine("{");
+            header.WriteLine("public:");
+            header.WriteLine("\t{0}CPP() {{ m_{0} = gcnew {0}(); }}", type.Name);
+            header.WriteLine("\t{0}CPP({0}^ _Internal) {{ m_{0} = _Internal; }}", type.Name);
+            header.WriteLine();
+
+            foreach (var property in type.GetProperties())
+            {
+                PrintPropertyDef(header, property, "\tvirtual ", ";", "Get");
+                PrintPropertyDef(header, property, "\tvirtual ", ";", "Set");
+                header.WriteLine("");
+            }
+
+            foreach (var function in type.GetMethods(BindingFlags.Public | BindingFlags.Instance))
+            {
+                if (function.Name.StartsWith("get_") || function.Name.StartsWith("set_"))
+                    continue;
+
+                if (function.Name == "GetType" || function.Name == "Equals")
+                    continue;
+
+                header.Write("\tvirtual ");
+                PrintFunctionDef(header, function);
+                header.WriteLine(";\n");
+            }
+
+            header.WriteLine("\t{0}^ InternalObject(){{return m_{0};}}", type.Name);
+            header.WriteLine("\tvirtual void Destroy(){delete this;}");
+            header.WriteLine();
+            header.WriteLine("private:");
+            header.WriteLine("\tmsclr::gcroot<{0}^> m_{0};", type.Name);
+            header.WriteLine("};");
         }
 
         private List<Type> GetAllUsedTypes(Type type)
@@ -164,7 +233,7 @@ namespace CSharpToCpp
             return types;
         }
 
-        private void PrintPropertyDef(TextWriter header, PropertyInfo property, string preFix, string postFix, string type)
+        private void PrintPropertyDef(TextWriter header, PropertyInfo property, string preFix, string postFix, string type, string namePrefix = "")
         {
             if (type == "Get")
             {
@@ -172,17 +241,17 @@ namespace CSharpToCpp
 
                 if (property.PropertyType == typeof(String))
                 {
-                    header.WriteLine(String.Format("void Get{0}(char* szOutBuff, size_t nOutBuffSize){1}", property.Name, postFix));
+                    header.WriteLine(String.Format("void {0}Get{1}(char* szOutBuff, size_t nOutBuffSize){2}", namePrefix, property.Name, postFix));
                 }
                 else
                 {
                     PrintParameterType(header, property.PropertyType);
-                    header.WriteLine(String.Format(" Get{0}(){1}", property.Name, postFix));
+                    header.WriteLine(String.Format(" {0}Get{1}(){2}", namePrefix, property.Name, postFix));
                 }
             }
             else
             {
-                header.Write(String.Format("{0}void Set{1}(", preFix, property.Name));
+                header.Write(String.Format("{0}void {1}Set{2}(", preFix, namePrefix, property.Name));
                 PrintParameterType(header, property.PropertyType);
                 header.WriteLine(String.Format(" _{0}){1}", property.Name, postFix));
             }
@@ -262,42 +331,33 @@ namespace CSharpToCpp
         {
             body.WriteLine("#define DLL_EXPORT");
             body.WriteLine("#include \"{0}.h\"", type.Name);
+
+            body.WriteLine("#include <xstring>");
+            body.WriteLine("#include <msclr\\marshal.h>");
+            body.WriteLine("#include <msclr\\marshal_cppstd.h>");
             body.WriteLine();
 
-            String NameSpace = type.FullName.Substring(0, type.FullName.LastIndexOf('.'));
-            NameSpace.Replace(".", "::");
-
-            body.WriteLine("using namespace {0};", NameSpace);
-            body.WriteLine();
-
-            body.WriteLine("class {0}CPP : public {0}I", type.Name);
-            body.WriteLine("{");
-            body.WriteLine("public:");
-
-            body.WriteLine("\t{0}CPP() {{ m_{0} = gcnew {0}(); }}", type.Name);
-            body.WriteLine("\t{0}CPP({0}^ _Internal) {{ m_{0} = _Internal; }}", type.Name);
-            body.WriteLine();
 
             foreach (var property in type.GetProperties())
             {
-                PrintPropertyDef(body, property, "\tvirtual ", "", "Get");
-                body.WriteLine("\t{");
+                PrintPropertyDef(body, property, "", "", "Get", type.Name + "CPP::");
+                body.WriteLine("{");
 
                 PrintFunctionReturnSetup(body, property.PropertyType);
                 body.WriteLine("m_{0}->{1};", type.Name, property.Name);
                 PrintFunctionReturnFinish(body, property.PropertyType);
 
-                body.WriteLine("\t}");
+                body.WriteLine("}");
                 body.WriteLine("");
 
-                PrintPropertyDef(body, property, "\tvirtual ", "", "Set");
-                body.WriteLine("\t{");
+                PrintPropertyDef(body, property, "", "", "Set", type.Name + "CPP::");
+                body.WriteLine("{");
 
-                body.Write("\t\tm_{0}->{1} = ", type.Name, property.Name);
+                body.Write("\tm_{0}->{1} = ", type.Name, property.Name);
                 PrintFunctionCallParameter(body, property.Name, property.PropertyType);
                 body.WriteLine(";");
 
-                body.WriteLine("\t}");
+                body.WriteLine("}");
                 body.WriteLine("");
             }
 
@@ -309,9 +369,12 @@ namespace CSharpToCpp
                 if (function.Name == "GetType" || function.Name == "Equals")
                     continue;
 
-                body.Write("\tvirtual ");
-                PrintFunctionDef(body, function);
-                body.WriteLine("\n\t{");
+
+                PrintFunctionDef(body, function, String.Format("{0}CPP::", type.Name));
+                body.WriteLine("\n{");
+
+                body.WriteLine("\ttry");
+                body.WriteLine("\t{");
 
                 PrintFunctionReturnSetup(body, function.ReturnType);
                 body.Write(String.Format("m_{0}->{1}(", type.Name, function.Name));
@@ -321,24 +384,26 @@ namespace CSharpToCpp
 
                 PrintFunctionReturnFinish(body, function.ReturnType);
 
+                body.WriteLine("\t}\n\tcatch (System::Exception^ e)\n\t{");
+
+                body.WriteLine("\t\tstd::string msg = msclr::interop::marshal_as<std::string>(e->Message);");
+                body.WriteLine("\t\tthrow std::exception(msg.c_str());");
+
                 body.WriteLine("\t}");
+                body.WriteLine("}");
                 body.WriteLine("");
             }
 
-            body.WriteLine("\t{0}^ InternalObject(){{return m_{0};}}", type.Name);
-            body.WriteLine("\tvirtual void Destroy(){delete this;}");
-            body.WriteLine();
-            body.WriteLine("private:");
-            body.WriteLine("\tgcroot<{0}^> m_{0};", type.Name);
-            body.WriteLine("};");
+
 
             body.WriteLine("");
             body.WriteLine("extern \"C\"");
             body.WriteLine("{");
 
+            int nCount = 0;
             foreach (var constructor in type.GetConstructors(BindingFlags.Public | BindingFlags.Instance))
             {
-                body.Write(String.Format("\tDLLFN {0}I* New{0}(", type.Name));
+                body.Write(String.Format("\tDLLFN {0}I* New{0}{1}(", type.Name, (nCount>0)?nCount.ToString():""));
 
                 bool first = true;
                 foreach (var paramater in constructor.GetParameters())
@@ -353,12 +418,14 @@ namespace CSharpToCpp
                 body.WriteLine(")");
                 body.WriteLine("\t{");
 
-                body.Write(String.Format("\t\treturn new {0}CPP(", type.Name));
+                body.Write(String.Format("\t\treturn new {0}CPP(gcnew {0}(", type.Name));
                 PrintConstructorCall(body, constructor);
-                body.WriteLine(");");
+                body.WriteLine("));");
 
                 body.WriteLine("\t}");
                 body.WriteLine("");
+
+                nCount++;
             }
 
             body.WriteLine("");
@@ -381,11 +448,6 @@ namespace CSharpToCpp
                 body.WriteLine();
             }
 
-            body.WriteLine("\t{0}I* New{0}CPP({0}^ _Internal)", type.Name);
-            body.WriteLine("\t{");
-            body.WriteLine("\t\treturn new {0}CPP(_Internal);", type.Name);
-            body.WriteLine("\t}");
-
             body.WriteLine("}");
         }
 
@@ -393,12 +455,12 @@ namespace CSharpToCpp
         {
             if (returnType == typeof(String))
             {
-                body.WriteLine("\t\tstd::string szRet = marshal_as<std::string>(ret);");
+                body.WriteLine("\t\tstd::string szRet = msclr::interop::marshal_as<std::string>(ret);");
                 body.WriteLine("\t\tstrncpy_s(szOutBuff, nOutBuffSize, szRet.c_str(), szRet.size());");
             }
             else if (returnType.IsClass)
             {
-                body.WriteLine("\t\treturn New{0}CPP(ret);", returnType.Name);
+                body.WriteLine("\t\treturn new {0}CPP(ret);", returnType.Name);
             }
         }
 
