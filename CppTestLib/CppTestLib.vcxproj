@@ -21,7 +21,7 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CLRSupport>true</CLRSupport>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -78,9 +78,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\BaseClass.h" />
+    <ClInclude Include="code\IInterfaceTestProxy.h" />
+    <ClInclude Include="code\NativeObject.h" />
+    <ClInclude Include="code\NativeObjectProxy.h" />
     <ClInclude Include="code\TestClass.h" />
     <ClInclude Include="CppTestLib.h" />
     <ClInclude Include="include\BaseClassI.h" />
+    <ClInclude Include="include\IInterfaceTestProxyI.h" />
+    <ClInclude Include="include\NativeObjectI.h" />
+    <ClInclude Include="include\NativeObjectProxyI.h" />
     <ClInclude Include="include\TestClassI.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Stdafx.h" />
@@ -88,6 +94,7 @@
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="code\BaseClass.cpp" />
+    <ClCompile Include="code\IInterfaceTestProxy.cpp" />
     <ClCompile Include="code\TestClass.cpp" />
     <ClCompile Include="CppTestLib.cpp" />
     <ClCompile Include="Stdafx.cpp">

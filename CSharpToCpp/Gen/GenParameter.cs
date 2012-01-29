@@ -30,20 +30,45 @@ namespace CSharpToCpp.Gen
         {
             Info = info;
             Type = info.ParameterType;
-
-            NativeType = GetParameterNativeType(Type);
             Name = info.Name;
-            CallName = GetParameterCallName(gc.Name, info.Name, info.ParameterType);
+
+            if (gc.Type.IsInterface)
+            {
+                NativeType = info.ParameterType.FullName.Replace(".", "::");
+
+                if (info.ParameterType.IsClass)
+                    NativeType += "^";
+
+                CallName = "Blah!";
+            }
+            else
+            {
+                NativeType = GetParameterNativeType(Type);
+                CallName = GetParameterCallName(gc.Name, info.Name, info.ParameterType);
+            }
         }
 
         static public string GetParameterCallName(String className, String paramName, Type paramType)
         {
             if (paramType == typeof(String))
-                return String.Format("gcnew System::String(_{0})", paramName);
+                return String.Format("gcnew System::String(_{0}.c_str())", paramName);
             else if (paramType.IsClass)
                 return String.Format("(({0}*)_{1})->InternalObject()", paramName, className);
             else if (paramType.IsInterface)
-                return String.Format("gcnew {0}Proxy(_{1})", paramType.Name, paramName);
+                return String.Format("gcnew {0}ProxyCPP(_{1})", paramType.Name, paramName);
+
+            return String.Format("_{0}", paramName);
+        }
+
+
+        static public string GetParameterCallManagedName(String className, String paramName, Type paramType)
+        {
+            if (paramType == typeof(String))
+                return String.Format("msclr::interop::marshal_as<std::string>(_{0})", paramName);
+            else if (paramType.IsClass)
+                return String.Format("new {0}CPP(_{1})", paramType.Name, paramName);
+            else if (paramType.IsInterface)
+                return String.Format("new {0}ProxyCPP(_{1})", paramType.Name, paramName);
 
             return String.Format("_{0}", paramName);
         }
@@ -74,9 +99,13 @@ namespace CSharpToCpp.Gen
             {
                 int a = 1;
             }
-            else if (parameterType.IsClass | parameterType.IsInterface)
+            else if (parameterType.IsClass)
             {
                 return parameterType.Name + "I*";
+            }
+            else if (parameterType.IsInterface)
+            {
+                return parameterType.Name + "ProxyI*";
             }
             else if (parameterType == typeof(void))
             {
@@ -85,6 +114,8 @@ namespace CSharpToCpp.Gen
 
             return "[FAIL]";
         }
+
+
     }
 
 }

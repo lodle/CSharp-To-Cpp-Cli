@@ -29,6 +29,7 @@ namespace CSharpToCpp.Gen
             {
                 Name = Name,
                 BaseName = BaseName,
+                ManagedName = Name.Replace("Proxy", ""),
                 Namespace = Namespace,
                 Headers = Headers,
                 Constructors = Constructors,
@@ -42,15 +43,29 @@ namespace CSharpToCpp.Gen
         {
             Type = type;
             Name = type.Name;
+
+
+
             Namespace = type.FullName.Substring(0, type.FullName.LastIndexOf('.')).Replace(".", "::");
 
             if (type.BaseType != null && type.BaseType != typeof(Object))
                 BaseName = type.BaseType.Name;
 
+            if (type.IsInterface)
+            {
+                Name += "Proxy";
+                BaseName += "Proxy";
+            }
+
             UsedTypes = GetAllUsedTypes(type);
 
             foreach (var usedType in UsedTypes)
-                Headers.Add(usedType.Name);
+            {
+                if (usedType.IsInterface)
+                    Headers.Add(usedType.Name + "Proxy");
+                else
+                    Headers.Add(usedType.Name);
+            }
 
             foreach (var con in type.GetConstructors(BindingFlags.Public | BindingFlags.Instance))
                 Constructors.Add(new GenConstructor(this, con));

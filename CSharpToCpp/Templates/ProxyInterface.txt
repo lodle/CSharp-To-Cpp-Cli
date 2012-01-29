@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "NativeObjectI.h"
+#include "NativeObjectProxyI.h"
 {% for header in c.Headers -%}
 #include "{{ header }}I.h"
 {% endfor -%}
@@ -10,6 +10,6 @@ class {{ c.Name }}I : public {{ c.BaseName }}I
 public:
 	//! Methods
 {% for fun in c.Functions -%}
-	virtual {{ fun.ReturnType }} {{ fun.Name }}({% parameters con.Parameters %})=0;
+	virtual {{ fun.ReturnType }} {{ fun.Name }}({% parameters fun.Parameters %})=0;
 {% endfor -%}
 };

@@ -3,6 +3,8 @@
 using namespace {{ c.Namespace }};
 
 #include "{{ c.Name }}I.h"
+#include "{{ c.BaseName }}.h"
+
 {% for header in c.Headers -%}
 #include "{{ header }}.h"
 {% endfor -%}
@@ -14,11 +16,11 @@ class {{ c.Name }}CPP : public virtual {{ c.Name }}I, public {{ c.BaseName }}CPP
 {
 public:
 	//! Constructors
-	{{ c.Name }}CPP() : m_{{ c.Name }}(gcnew {{ c.Name }}()), BaseClassCPP(m_{{ c.Name }}) 
+	{{ c.Name }}CPP() : m_{{ c.Name }}(gcnew {{ c.Name }}()), {{ c.BaseName }}CPP(m_{{ c.Name }}) 
 	{
 	}
 
-	{{ c.Name }}CPP({{ c.Name }}^ _Internal) : m_{{ c.Name }}(_Internal), BaseClassCPP(m_{{ c.Name }}) 
+	{{ c.Name }}CPP({{ c.Name }}^ _Internal) : m_{{ c.Name }}(_Internal), {{ c.BaseName }}CPP(m_{{ c.Name }}) 
 	{
 	}	
 
@@ -41,6 +43,16 @@ public:
 	virtual void Destroy()
 	{
 		delete this;
+	}
+
+	virtual int GetHashCode()
+	{
+		return {{ c.BaseName }}CPP::GetHashCode();
+	}
+	
+	virtual std::string ToString()
+	{
+		return {{ c.BaseName }}CPP::ToString();
 	}
 
 private:

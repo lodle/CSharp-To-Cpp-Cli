@@ -3,6 +3,8 @@
 using namespace CSharpTestLib;
 
 #include "BaseClassI.h"
+#include "NativeObject.h"
+
 
 #include <msclr\gcroot.h>
 
@@ -11,11 +13,11 @@ class BaseClassCPP : public virtual BaseClassI, public NativeObjectCPP
 {
 public:
 	//! Constructors
-	BaseClassCPP() : m_BaseClass(gcnew BaseClass()), BaseClassCPP(m_BaseClass) 
+	BaseClassCPP() : m_BaseClass(gcnew BaseClass()), NativeObjectCPP(m_BaseClass) 
 	{
 	}
 
-	BaseClassCPP(BaseClass^ _Internal) : m_BaseClass(_Internal), BaseClassCPP(m_BaseClass) 
+	BaseClassCPP(BaseClass^ _Internal) : m_BaseClass(_Internal), NativeObjectCPP(m_BaseClass) 
 	{
 	}	
 
@@ -32,6 +34,16 @@ public:
 	virtual void Destroy()
 	{
 		delete this;
+	}
+
+	virtual int GetHashCode()
+	{
+		return NativeObjectCPP::GetHashCode();
+	}
+	
+	virtual std::string ToString()
+	{
+		return NativeObjectCPP::ToString();
 	}
 
 private:

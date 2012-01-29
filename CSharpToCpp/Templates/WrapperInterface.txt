@@ -15,7 +15,7 @@ public:
 
 	//! Static
 {% for fun in c.StaticFunctions -%}
-	static {{ fun.ReturnType }} {{ fun.Name }}({% parameters con.Parameters %});
+	static {{ fun.ReturnType }} {{ fun.Name }}({% parameters fun.Parameters %});
 {% endfor -%}
 
 	//! Properties

@@ -9,10 +9,9 @@
 
 ////////////////////// Functions //////////////////////
 {% for fun in c.Functions -%}
-{{ fun.ReturnType }} {{ c.Name }}::{{ fun.Name }}({% parameters fun.Parameters %})
+{{ fun.ReturnType }} {{ c.Name }}CPP::{{ fun.Name }}({% parameters fun.Parameters %})
 {
-	{% parametersConvertNative fun.Parameters %}
-	{% if fun.IsVoidReturn == false -%}return {% endif %}m_{{ c.Name }}->{{ fun.Name }}({% parametersCallNative fun.Parameters %});
+
 }
 
 {% endfor -%}

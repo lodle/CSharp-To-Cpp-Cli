@@ -9,51 +9,54 @@
 
 
 ////////////////////// Constructors //////////////////////
-TestClassI* TestClass::NewTestClass()
+TestClassI* TestClassI::NewTestClass()
 {
 	return new TestClassCPP(gcnew TestClass());
 }
 
-TestClassI* TestClass::NewTestClass(int _a, std::string _b)
+TestClassI* TestClassI::NewTestClass(int _a, std::string _b)
 {
-	return new TestClassCPP(gcnew TestClass(_a, gcnew System::String(_b)));
+	return new TestClassCPP(gcnew TestClass(_a, gcnew System::String(_b.c_str())));
 }
 
 
 ////////////////////// Static Functions //////////////////////
-int TestClass::StaticTwo()
+int TestClassI::StaticTwo(std::string _a, int _b)
 {
 	try
 	{
-		return m_TestClass->StaticTwo();
+		int _res = TestClass::StaticTwo(gcnew System::String(_a.c_str()), _b);
+		return _ret;
 	}
-	catch (System::Exception e)
+	catch (System::Exception^ e)
 	{
 		std::string msg = msclr::interop::marshal_as<std::string>(e->Message);
 		throw std::exception(msg.c_str());		
 	}
 }
 
-std::string TestClass::StaticThree()
+std::string TestClassI::StaticThree()
 {
 	try
 	{
-		return m_TestClass->StaticThree();
+		System::String^ _res = TestClass::StaticThree();
+		return msclr::interop::marshal_as<std::string>(_ret);
 	}
-	catch (System::Exception e)
+	catch (System::Exception^ e)
 	{
 		std::string msg = msclr::interop::marshal_as<std::string>(e->Message);
 		throw std::exception(msg.c_str());		
 	}
 }
 
-BaseClassI* TestClass::NewBaseClass()
+BaseClassI* TestClassI::NewBaseClass()
 {
 	try
 	{
-		return m_TestClass->NewBaseClass();
+		CSharpTestLib::BaseClass^ _res = TestClass::NewBaseClass();
+		return new BaseClassCPP(_ret);
 	}
-	catch (System::Exception e)
+	catch (System::Exception^ e)
 	{
 		std::string msg = msclr::interop::marshal_as<std::string>(e->Message);
 		throw std::exception(msg.c_str());		
@@ -65,61 +68,63 @@ BaseClassI* TestClass::NewBaseClass()
 
 
 ////////////////////// Propeties //////////////////////
-std::string TestClass::GetClassName()
+std::string TestClassCPP::GetClassName()
 {
 	return m_TestClass->ClassName;
 }
 
-void TestClass::SetClassName(std::string _Value)
+void TestClassCPP::SetClassName(std::string _Value)
 {
-	m_TestClass->ClassName = gcnew System::String(_Value);
+	m_TestClass->ClassName = gcnew System::String(_Value.c_str());
 }
 
-int TestClass::GetClassCount()
+int TestClassCPP::GetClassCount()
 {
 	return m_TestClass->ClassCount;
 }
 
-void TestClass::SetClassCount(int _Value)
+void TestClassCPP::SetClassCount(int _Value)
 {
 	m_TestClass->ClassCount = _Value;
 }
 
 
 ////////////////////// Functions //////////////////////
-int TestClass::GetIntGSDF(IInterfaceTestI* _test)
+int TestClassCPP::GetIntGSDF(IInterfaceTestProxyI* _test)
 {
 	try
 	{
-		return m_TestClass->GetIntGSDF(gcnew IInterfaceTestProxy(_test));
+		int _res = m_TestClass->GetIntGSDF(gcnew IInterfaceTestProxyCPP(_test));
+		return _ret;
 	}
-	catch (System::Exception e)
+	catch (System::Exception^ e)
 	{
 		std::string msg = msclr::interop::marshal_as<std::string>(e->Message);
 		throw std::exception(msg.c_str());		
 	}
 }
 
-void TestClass::DoStuff(double _val)
+void TestClassCPP::DoStuff(double _val)
 {
 	try
 	{
-		m_TestClass->DoStuff(_val);
+		TestClass::DoStuff(_val);
 	}
-	catch (System::Exception e)
+	catch (System::Exception^ e)
 	{
 		std::string msg = msclr::interop::marshal_as<std::string>(e->Message);
 		throw std::exception(msg.c_str());		
 	}
 }
 
-int TestClass::DoMoreStuff(std::string _strVal)
+int TestClassCPP::DoMoreStuff(std::string _strVal)
 {
 	try
 	{
-		return m_TestClass->DoMoreStuff(gcnew System::String(_strVal));
+		int _res = m_TestClass->DoMoreStuff(gcnew System::String(_strVal.c_str()));
+		return _ret;
 	}
-	catch (System::Exception e)
+	catch (System::Exception^ e)
 	{
 		std::string msg = msclr::interop::marshal_as<std::string>(e->Message);
 		throw std::exception(msg.c_str());		

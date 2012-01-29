@@ -30,17 +30,35 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="code\BaseClass.h">
-      <Filter>Source Files\code</Filter>
-    </ClInclude>
-    <ClInclude Include="code\TestClass.h">
-      <Filter>Source Files\code</Filter>
-    </ClInclude>
     <ClInclude Include="include\BaseClassI.h">
+      <Filter>Source Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IInterfaceTestProxyI.h">
+      <Filter>Source Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\NativeObjectI.h">
+      <Filter>Source Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\NativeObjectProxyI.h">
       <Filter>Source Files\include</Filter>
     </ClInclude>
     <ClInclude Include="include\TestClassI.h">
       <Filter>Source Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="code\BaseClass.h">
+      <Filter>Source Files\code</Filter>
+    </ClInclude>
+    <ClInclude Include="code\IInterfaceTestProxy.h">
+      <Filter>Source Files\code</Filter>
+    </ClInclude>
+    <ClInclude Include="code\NativeObject.h">
+      <Filter>Source Files\code</Filter>
+    </ClInclude>
+    <ClInclude Include="code\NativeObjectProxy.h">
+      <Filter>Source Files\code</Filter>
+    </ClInclude>
+    <ClInclude Include="code\TestClass.h">
+      <Filter>Source Files\code</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -54,6 +72,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="code\BaseClass.cpp">
+      <Filter>Source Files\code</Filter>
+    </ClCompile>
+    <ClCompile Include="code\IInterfaceTestProxy.cpp">
       <Filter>Source Files\code</Filter>
     </ClCompile>
     <ClCompile Include="code\TestClass.cpp">

@@ -10,7 +10,7 @@
 
 ////////////////////// Constructors //////////////////////
 {% for con in c.Constructors -%}
-{{ c.Name }}I* {{ c.Name }}::New{{ c.Name }}({% parameters con.Parameters %})
+{{ c.Name }}I* {{ c.Name }}I::New{{ c.Name }}({% parameters con.Parameters %})
 {
 	return new {{ c.Name }}CPP(gcnew {{ c.Name }}({% parametersCall con.Parameters %}));
 }
@@ -19,13 +19,18 @@
 
 ////////////////////// Static Functions //////////////////////
 {% for fun in c.StaticFunctions -%}
-{{ fun.ReturnType }} {{ c.Name }}::{{ fun.Name }}({% parameters con.Parameters %})
+{{ fun.ReturnType }} {{ c.Name }}I::{{ fun.Name }}({% parameters fun.Parameters %})
 {
 	try
 	{
-		{% if fun.IsVoidReturn == false -%}return {% endif %}m_{{ c.Name }}->{{ fun.Name }}({% parametersCall con.Parameters %});
+{% if fun.IsVoidReturn == false -%}
+		{{ fun.ReturnManagedType }} _res = {{ c.Name }}::{{ fun.Name }}({% parametersCall fun.Parameters %});
+		return {{ fun.ReturnName }};
+{% else -%}
+		{{ c.Name }}::{{ fun.Name }}({% parametersCall fun.Parameters %});
+{% endif -%}
 	}
-	catch (System::Exception e)
+	catch (System::Exception^ e)
 	{
 		std::string msg = msclr::interop::marshal_as<std::string>(e->Message);
 		throw std::exception(msg.c_str());		
@@ -39,12 +44,12 @@
 
 ////////////////////// Propeties //////////////////////
 {% for fun in c.Properties -%}
-{{ fun.NativeType }} {{ c.Name }}::Get{{ fun.Name }}()
+{{ fun.NativeType }} {{ c.Name }}CPP::Get{{ fun.Name }}()
 {
 	return m_{{ c.Name }}->{{ fun.Name }};
 }
 
-void {{ c.Name }}::Set{{ fun.Name }}({{ fun.NativeType }} _Value)
+void {{ c.Name }}CPP::Set{{ fun.Name }}({{ fun.NativeType }} _Value)
 {
 	m_{{ c.Name }}->{{ fun.Name }} = {{ fun.SetName }};
 }
@@ -53,13 +58,18 @@ void {{ c.Name }}::Set{{ fun.Name }}({{ fun.NativeType }} _Value)
 
 ////////////////////// Functions //////////////////////
 {% for fun in c.Functions -%}
-{{ fun.ReturnType }} {{ c.Name }}::{{ fun.Name }}({% parameters fun.Parameters %})
+{{ fun.ReturnType }} {{ c.Name }}CPP::{{ fun.Name }}({% parameters fun.Parameters %})
 {
 	try
 	{
-		{% if fun.IsVoidReturn == false -%}return {% endif %}m_{{ c.Name }}->{{ fun.Name }}({% parametersCall fun.Parameters %});
+{% if fun.IsVoidReturn == false -%}
+		{{ fun.ReturnManagedType }} _res = m_{{ c.Name }}->{{ fun.Name }}({% parametersCall fun.Parameters %});
+		return {{ fun.ReturnName }};
+{% else -%}
+		{{ c.Name }}::{{ fun.Name }}({% parametersCall fun.Parameters %});
+{% endif -%}
 	}
-	catch (System::Exception e)
+	catch (System::Exception^ e)
 	{
 		std::string msg = msclr::interop::marshal_as<std::string>(e->Message);
 		throw std::exception(msg.c_str());		

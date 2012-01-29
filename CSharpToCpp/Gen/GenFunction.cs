@@ -11,6 +11,9 @@ namespace CSharpToCpp.Gen
     {
         public String Name;
         public String ReturnType;
+        public String ReturnManagedType;
+        public String ReturnName;
+
         public bool IsVoidReturn;
         public MethodInfo Info;
 
@@ -21,6 +24,8 @@ namespace CSharpToCpp.Gen
                 Name = Name,
                 IsVoidReturn = IsVoidReturn,
                 ReturnType = ReturnType,
+                ReturnManagedType = ReturnManagedType,
+                ReturnName = ReturnName,
                 Parameters = Parameters
             });
         }
@@ -33,6 +38,18 @@ namespace CSharpToCpp.Gen
 
             IsVoidReturn = info.ReturnParameter.ParameterType == typeof(void);
             ReturnType = GenParameter.GetParameterNativeType(info.ReturnParameter.ParameterType);
+
+            if (info.ReturnParameter.ParameterType.IsClass)
+            {
+                ReturnManagedType = info.ReturnParameter.ParameterType.FullName.Replace(".", "::");
+                ReturnManagedType += "^";
+            }
+            else
+            {
+                ReturnManagedType = ReturnType;
+            }
+
+            ReturnName = GenParameter.GetParameterCallManagedName(gc.Name, "ret", info.ReturnParameter.ParameterType);
         }
     }
 }

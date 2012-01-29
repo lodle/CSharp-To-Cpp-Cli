@@ -4,7 +4,9 @@ using namespace CSharpTestLib;
 
 #include "TestClassI.h"
 #include "BaseClass.h"
-#include "IInterfaceTest.h"
+
+#include "BaseClass.h"
+#include "IInterfaceTestProxy.h"
 
 #include <msclr\gcroot.h>
 
@@ -28,7 +30,7 @@ public:
 	virtual void SetClassCount(int _Value);
 
 	//! Methods
-	virtual int GetIntGSDF(IInterfaceTestI* _test);
+	virtual int GetIntGSDF(IInterfaceTestProxyI* _test);
 	virtual void DoStuff(double _val);
 	virtual int DoMoreStuff(std::string _strVal);
 
@@ -40,6 +42,16 @@ public:
 	virtual void Destroy()
 	{
 		delete this;
+	}
+
+	virtual int GetHashCode()
+	{
+		return BaseClassCPP::GetHashCode();
+	}
+	
+	virtual std::string ToString()
+	{
+		return BaseClassCPP::ToString();
 	}
 
 private:

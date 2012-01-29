@@ -28,8 +28,13 @@ namespace CSharpToCpp
             Template.RegisterTag<ParametersTag>("parameters");
             Template.RegisterTag<ParametersCallTag>("parametersCall");
             Template.RegisterTag<FunctionCallTag>("functionCall");
+            Template.RegisterTag<FunctionReturnTag>("functionReturn");
 
             GenerateTemplate(null, "NativeObjectInterface.txt", OutPath + "\\include\\NativeObjectI.h");
+            GenerateTemplate(null, "NativeObjectHeader.txt", OutPath + "\\code\\NativeObject.h");
+
+            GenerateTemplate(null, "NativeObjectProxyInterface.txt", OutPath + "\\include\\NativeObjectProxyI.h");
+            GenerateTemplate(null, "NativeObjectProxyHeader.txt", OutPath + "\\code\\NativeObjectProxy.h");
         }
 
         public void Generate(Type type)
@@ -45,9 +50,9 @@ namespace CSharpToCpp
 
             if (type.IsInterface)
             {
-                GenerateTemplate(gc, "ProxyInterface.txt", OutPath + "\\include\\" + type.Name + "I.h");
-                GenerateTemplate(gc, "ProxyHeader.txt", OutPath + "\\code\\" + type.Name + ".h");
-                GenerateTemplate(gc, "ProxyBody.txt", OutPath + "\\code\\" + type.Name + ".cpp");
+                GenerateTemplate(gc, "ProxyInterface.txt", OutPath + "\\include\\" + type.Name + "ProxyI.h");
+                GenerateTemplate(gc, "ProxyHeader.txt", OutPath + "\\code\\" + type.Name + "Proxy.h");
+                GenerateTemplate(gc, "ProxyBody.txt", OutPath + "\\code\\" + type.Name + "Proxy.cpp");
             }
             else
             {

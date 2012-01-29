@@ -1,9 +1,5 @@
 ﻿#pragma once
 
-{% for header in c.Headers %}
-#include "{{ header }}I.h"
-{% endfor %}
-
 #ifndef DLLEXPORT
 	#ifndef CPP_CLI_DLL
 		#define DLLEXPORT __declspec( dllimport )
@@ -12,10 +8,12 @@
 	#endif
 #endif
 
+#include <xstring>
+
 
 class NativeObjectI
 {
 public:
-	vritual std::string ToString()=0;
+	virtual std::string ToString()=0;
 	virtual int GetHashCode()=0;
 };

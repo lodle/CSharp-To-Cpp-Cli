@@ -9,20 +9,20 @@
 
 
 ////////////////////// Constructors //////////////////////
-BaseClassI* BaseClass::NewBaseClass()
+BaseClassI* BaseClassI::NewBaseClass()
 {
 	return new BaseClassCPP(gcnew BaseClass());
 }
 
 
 ////////////////////// Static Functions //////////////////////
-void BaseClass::StaticOne()
+void BaseClassI::StaticOne()
 {
 	try
 	{
-		m_BaseClass->StaticOne();
+		BaseClass::StaticOne();
 	}
-	catch (System::Exception e)
+	catch (System::Exception^ e)
 	{
 		std::string msg = msclr::interop::marshal_as<std::string>(e->Message);
 		throw std::exception(msg.c_str());		
@@ -36,13 +36,14 @@ void BaseClass::StaticOne()
 ////////////////////// Propeties //////////////////////
 
 ////////////////////// Functions //////////////////////
-int BaseClass::DoMoreStuff(std::string _strVal)
+int BaseClassCPP::DoMoreStuff(std::string _strVal)
 {
 	try
 	{
-		return m_BaseClass->DoMoreStuff(gcnew System::String(_strVal));
+		int _res = m_BaseClass->DoMoreStuff(gcnew System::String(_strVal.c_str()));
+		return _ret;
 	}
-	catch (System::Exception e)
+	catch (System::Exception^ e)
 	{
 		std::string msg = msclr::interop::marshal_as<std::string>(e->Message);
 		throw std::exception(msg.c_str());		

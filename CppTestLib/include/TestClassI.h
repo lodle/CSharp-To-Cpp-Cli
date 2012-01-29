@@ -2,7 +2,7 @@
 
 #include "NativeObjectI.h"
 #include "BaseClassI.h"
-#include "IInterfaceTestI.h"
+#include "IInterfaceTestProxyI.h"
 
 class DLLEXPORT TestClassI : public BaseClassI
 {
@@ -12,7 +12,7 @@ public:
 	static TestClassI* NewTestClass(int _a, std::string _b);
 
 	//! Static
-	static int StaticTwo();
+	static int StaticTwo(std::string _a, int _b);
 	static std::string StaticThree();
 	static BaseClassI* NewBaseClass();
 
@@ -23,7 +23,7 @@ public:
 	virtual void SetClassCount(int _Value)=0;
 
 	//! Methods
-	virtual int GetIntGSDF(IInterfaceTestI* _test)=0;
+	virtual int GetIntGSDF(IInterfaceTestProxyI* _test)=0;
 	virtual void DoStuff(double _val)=0;
 	virtual int DoMoreStuff(std::string _strVal)=0;
 };
