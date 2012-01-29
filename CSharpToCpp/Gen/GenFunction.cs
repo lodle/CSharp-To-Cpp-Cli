@@ -49,7 +49,7 @@ namespace CSharpToCpp.Gen
                 ReturnManagedType = ReturnType;
             }
 
-            ReturnName = GenParameter.GetParameterCallManagedName(gc.Name, "ret", info.ReturnParameter.ParameterType);
+            ReturnName = GenParameter.GetParameterCallManagedName(gc.Name, "res", info.ReturnParameter.ParameterType);
         }
     }
 }

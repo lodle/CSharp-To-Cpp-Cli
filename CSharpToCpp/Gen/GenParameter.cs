@@ -22,7 +22,7 @@ namespace CSharpToCpp.Gen
             {
                 Name = Name,
                 CallName = CallName,
-                NativeType = NativeType
+                NativeType = NativeType,
             });
         }
 

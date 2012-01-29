@@ -41,7 +41,7 @@ int BaseClassCPP::DoMoreStuff(std::string _strVal)
 	try
 	{
 		int _res = m_BaseClass->DoMoreStuff(gcnew System::String(_strVal.c_str()));
-		return _ret;
+		return _res;
 	}
 	catch (System::Exception^ e)
 	{

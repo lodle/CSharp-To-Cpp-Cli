@@ -46,7 +46,8 @@
 {% for fun in c.Properties -%}
 {{ fun.NativeType }} {{ c.Name }}CPP::Get{{ fun.Name }}()
 {
-	return m_{{ c.Name }}->{{ fun.Name }};
+	{{ fun.ReturnManagedType }} _res = m_{{ c.Name }}->{{ fun.Name }};
+	return {{ fun.ReturnName }};
 }
 
 void {{ c.Name }}CPP::Set{{ fun.Name }}({{ fun.NativeType }} _Value)
@@ -66,7 +67,7 @@ void {{ c.Name }}CPP::Set{{ fun.Name }}({{ fun.NativeType }} _Value)
 		{{ fun.ReturnManagedType }} _res = m_{{ c.Name }}->{{ fun.Name }}({% parametersCall fun.Parameters %});
 		return {{ fun.ReturnName }};
 {% else -%}
-		{{ c.Name }}::{{ fun.Name }}({% parametersCall fun.Parameters %});
+		m_{{ c.Name }}->{{ fun.Name }}({% parametersCall fun.Parameters %});
 {% endif -%}
 	}
 	catch (System::Exception^ e)

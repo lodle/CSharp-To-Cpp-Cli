@@ -26,7 +26,7 @@ int TestClassI::StaticTwo(std::string _a, int _b)
 	try
 	{
 		int _res = TestClass::StaticTwo(gcnew System::String(_a.c_str()), _b);
-		return _ret;
+		return _res;
 	}
 	catch (System::Exception^ e)
 	{
@@ -40,7 +40,7 @@ std::string TestClassI::StaticThree()
 	try
 	{
 		System::String^ _res = TestClass::StaticThree();
-		return msclr::interop::marshal_as<std::string>(_ret);
+		return msclr::interop::marshal_as<std::string>(_res);
 	}
 	catch (System::Exception^ e)
 	{
@@ -54,7 +54,7 @@ BaseClassI* TestClassI::NewBaseClass()
 	try
 	{
 		CSharpTestLib::BaseClass^ _res = TestClass::NewBaseClass();
-		return new BaseClassCPP(_ret);
+		return new BaseClassCPP(_res);
 	}
 	catch (System::Exception^ e)
 	{
@@ -70,7 +70,8 @@ BaseClassI* TestClassI::NewBaseClass()
 ////////////////////// Propeties //////////////////////
 std::string TestClassCPP::GetClassName()
 {
-	return m_TestClass->ClassName;
+	System::String^ _res = m_TestClass->ClassName;
+	return msclr::interop::marshal_as<std::string>(_res);
 }
 
 void TestClassCPP::SetClassName(std::string _Value)
@@ -80,7 +81,8 @@ void TestClassCPP::SetClassName(std::string _Value)
 
 int TestClassCPP::GetClassCount()
 {
-	return m_TestClass->ClassCount;
+	int _res = m_TestClass->ClassCount;
+	return _res;
 }
 
 void TestClassCPP::SetClassCount(int _Value)
@@ -95,7 +97,7 @@ int TestClassCPP::GetIntGSDF(IInterfaceTestProxyI* _test)
 	try
 	{
 		int _res = m_TestClass->GetIntGSDF(gcnew IInterfaceTestProxyCPP(_test));
-		return _ret;
+		return _res;
 	}
 	catch (System::Exception^ e)
 	{
@@ -108,7 +110,7 @@ void TestClassCPP::DoStuff(double _val)
 {
 	try
 	{
-		TestClass::DoStuff(_val);
+		m_TestClass->DoStuff(_val);
 	}
 	catch (System::Exception^ e)
 	{
@@ -122,7 +124,7 @@ int TestClassCPP::DoMoreStuff(std::string _strVal)
 	try
 	{
 		int _res = m_TestClass->DoMoreStuff(gcnew System::String(_strVal.c_str()));
-		return _ret;
+		return _res;
 	}
 	catch (System::Exception^ e)
 	{
