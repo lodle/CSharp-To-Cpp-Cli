@@ -1,0 +1,69 @@
+﻿#define CPP_CLI_DLL
+
+#include "{{ c.Name }}.h"
+
+#include <xstring>
+#include <msclr\marshal.h>
+#include <msclr\marshal_cppstd.h>
+
+
+
+////////////////////// Constructors //////////////////////
+{% for con in c.Constructors -%}
+{{ c.Name }}I* {{ c.Name }}::New{{ c.Name }}({% parameters con.Parameters %})
+{
+	return new {{ c.Name }}CPP(gcnew {{ c.Name }}({% parametersCall con.Parameters %}));
+}
+
+{% endfor -%}
+
+////////////////////// Static Functions //////////////////////
+{% for fun in c.StaticFunctions -%}
+{{ fun.ReturnType }} {{ c.Name }}::{{ fun.Name }}({% parameters con.Parameters %})
+{
+	try
+	{
+		{% if fun.IsVoidReturn == false -%}return {% endif %}m_{{ c.Name }}->{{ fun.Name }}({% parametersCall con.Parameters %});
+	}
+	catch (System::Exception e)
+	{
+		std::string msg = msclr::interop::marshal_as<std::string>(e->Message);
+		throw std::exception(msg.c_str());		
+	}
+}
+
+{% endfor -%}
+
+
+
+
+////////////////////// Propeties //////////////////////
+{% for fun in c.Properties -%}
+{{ fun.NativeType }} {{ c.Name }}::Get{{ fun.Name }}()
+{
+	return m_{{ c.Name }}->{{ fun.Name }};
+}
+
+void {{ c.Name }}::Set{{ fun.Name }}({{ fun.NativeType }} _Value)
+{
+	m_{{ c.Name }}->{{ fun.Name }} = {{ fun.SetName }};
+}
+
+{% endfor -%}
+
+////////////////////// Functions //////////////////////
+{% for fun in c.Functions -%}
+{{ fun.ReturnType }} {{ c.Name }}::{{ fun.Name }}({% parameters fun.Parameters %})
+{
+	try
+	{
+		{% if fun.IsVoidReturn == false -%}return {% endif %}m_{{ c.Name }}->{{ fun.Name }}({% parametersCall fun.Parameters %});
+	}
+	catch (System::Exception e)
+	{
+		std::string msg = msclr::interop::marshal_as<std::string>(e->Message);
+		throw std::exception(msg.c_str());		
+	}
+}
+
+{% endfor -%}

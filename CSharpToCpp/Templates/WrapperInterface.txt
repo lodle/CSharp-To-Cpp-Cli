@@ -1,0 +1,31 @@
+﻿#pragma once
+
+#include "NativeObjectI.h"
+{% for header in c.Headers -%}
+#include "{{ header }}I.h"
+{% endfor -%}
+
+class DLLEXPORT {{ c.Name }}I : public {{ c.BaseName }}I
+{
+public:
+	//! Constructors
+{% for con in c.Constructors -%}
+	static {{ c.Name }}I* New{{ c.Name }}({% parameters con.Parameters %});
+{% endfor -%}
+
+	//! Static
+{% for fun in c.StaticFunctions -%}
+	static {{ fun.ReturnType }} {{ fun.Name }}({% parameters con.Parameters %});
+{% endfor -%}
+
+	//! Properties
+{% for fun in c.Properties -%}
+	virtual {{ fun.NativeType }} Get{{ fun.Name }}()=0;
+	virtual void Set{{ fun.Name }}({{ fun.NativeType }} _Value)=0;
+{% endfor -%}
+
+	//! Methods
+{% for fun in c.Functions -%}
+	virtual {{ fun.ReturnType }} {{ fun.Name }}({% parameters fun.Parameters %})=0;
+{% endfor -%}
+};

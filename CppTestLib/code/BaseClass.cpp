@@ -1,62 +1,51 @@
-#define DLL_EXPORT
+#define CPP_CLI_DLL
+
 #include "BaseClass.h"
+
 #include <xstring>
 #include <msclr\marshal.h>
 #include <msclr\marshal_cppstd.h>
 
-int BaseClassCPP::DoMoreStuff(const char* _strVal)
+
+
+////////////////////// Constructors //////////////////////
+BaseClassI* BaseClass::NewBaseClass()
+{
+	return new BaseClassCPP(gcnew BaseClass());
+}
+
+
+////////////////////// Static Functions //////////////////////
+void BaseClass::StaticOne()
+{
+	try
+	{
+		m_BaseClass->StaticOne();
+	}
+	catch (System::Exception e)
+	{
+		std::string msg = msclr::interop::marshal_as<std::string>(e->Message);
+		throw std::exception(msg.c_str());		
+	}
+}
+
+
+
+
+
+////////////////////// Propeties //////////////////////
+
+////////////////////// Functions //////////////////////
+int BaseClass::DoMoreStuff(std::string _strVal)
 {
 	try
 	{
 		return m_BaseClass->DoMoreStuff(gcnew System::String(_strVal));
 	}
-	catch (System::Exception^ e)
+	catch (System::Exception e)
 	{
 		std::string msg = msclr::interop::marshal_as<std::string>(e->Message);
-		throw std::exception(msg.c_str());
+		throw std::exception(msg.c_str());		
 	}
 }
 
-void BaseClassCPP::ToString(char* szOutBuff, size_t nOutBuffSize)
-{
-	try
-	{
-		System::String^ ret = m_BaseClass->ToString();
-		std::string szRet = msclr::interop::marshal_as<std::string>(ret);
-		strncpy_s(szOutBuff, nOutBuffSize, szRet.c_str(), szRet.size());
-	}
-	catch (System::Exception^ e)
-	{
-		std::string msg = msclr::interop::marshal_as<std::string>(e->Message);
-		throw std::exception(msg.c_str());
-	}
-}
-
-int BaseClassCPP::GetHashCode()
-{
-	try
-	{
-		return m_BaseClass->GetHashCode();
-	}
-	catch (System::Exception^ e)
-	{
-		std::string msg = msclr::interop::marshal_as<std::string>(e->Message);
-		throw std::exception(msg.c_str());
-	}
-}
-
-
-extern "C"
-{
-	DLLFN BaseClassI* NewBaseClass()
-	{
-		return new BaseClassCPP(gcnew BaseClass());
-	}
-
-
-	DLLFN void BaseClass_StaticOne()
-	{
-		return BaseClass::StaticOne();
-	}
-
-}

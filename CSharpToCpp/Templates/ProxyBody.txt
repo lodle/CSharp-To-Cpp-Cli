@@ -1,0 +1,18 @@
+﻿#define CPP_CLI_DLL
+
+#include "{{ c.Name }}.h"
+
+#include <xstring>
+#include <msclr\marshal.h>
+#include <msclr\marshal_cppstd.h>
+
+
+////////////////////// Functions //////////////////////
+{% for fun in c.Functions -%}
+{{ fun.ReturnType }} {{ c.Name }}::{{ fun.Name }}({% parameters fun.Parameters %})
+{
+	{% parametersConvertNative fun.Parameters %}
+	{% if fun.IsVoidReturn == false -%}return {% endif %}m_{{ c.Name }}->{{ fun.Name }}({% parametersCallNative fun.Parameters %});
+}
+
+{% endfor -%}

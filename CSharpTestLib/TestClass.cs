@@ -19,6 +19,11 @@ namespace CSharpTestLib
         }
     }
 
+    public interface IInterfaceTest
+    {
+        void Abcd(String d);
+    }
+
     [ExposeToCpp]
     public class TestClass : BaseClass
     {
@@ -33,7 +38,7 @@ namespace CSharpTestLib
         {
         }
 
-        public int GetInt()
+        public int GetIntGSDF(IInterfaceTest test)
         {
             return 0;
         }

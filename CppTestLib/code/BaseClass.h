@@ -1,24 +1,38 @@
 #pragma once
+
 using namespace CSharpTestLib;
 
 #include "BaseClassI.h"
+
 #include <msclr\gcroot.h>
 
 
-class BaseClassCPP : public virtual BaseClassI
+class BaseClassCPP : public virtual BaseClassI, public NativeObjectCPP
 {
 public:
-	BaseClassCPP() { m_BaseClass = gcnew BaseClass(); }
-	BaseClassCPP(BaseClass^ _Internal) { m_BaseClass = _Internal; }
+	//! Constructors
+	BaseClassCPP() : m_BaseClass(gcnew BaseClass()), BaseClassCPP(m_BaseClass) 
+	{
+	}
 
-	virtual int DoMoreStuff(const char* _strVal);
+	BaseClassCPP(BaseClass^ _Internal) : m_BaseClass(_Internal), BaseClassCPP(m_BaseClass) 
+	{
+	}	
 
-	virtual void ToString(char* szOutBuff, size_t nOutBuffSize);
+	//! Properties
 
-	virtual int GetHashCode();
+	//! Methods
+	virtual int DoMoreStuff(std::string _strVal);
 
-	BaseClass^ InternalObject(){return m_BaseClass;}
-	virtual void Destroy(){delete this;}
+	BaseClass^ InternalObject()
+	{
+		return m_BaseClass;
+	}
+
+	virtual void Destroy()
+	{
+		delete this;
+	}
 
 private:
 	msclr::gcroot<BaseClass^> m_BaseClass;

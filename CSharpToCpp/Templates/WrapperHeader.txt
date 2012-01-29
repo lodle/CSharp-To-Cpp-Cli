@@ -1,0 +1,48 @@
+﻿#pragma once
+
+using namespace {{ c.Namespace }};
+
+#include "{{ c.Name }}I.h"
+{% for header in c.Headers -%}
+#include "{{ header }}.h"
+{% endfor -%}
+
+#include <msclr\gcroot.h>
+
+
+class {{ c.Name }}CPP : public virtual {{ c.Name }}I, public {{ c.BaseName }}CPP
+{
+public:
+	//! Constructors
+	{{ c.Name }}CPP() : m_{{ c.Name }}(gcnew {{ c.Name }}()), BaseClassCPP(m_{{ c.Name }}) 
+	{
+	}
+
+	{{ c.Name }}CPP({{ c.Name }}^ _Internal) : m_{{ c.Name }}(_Internal), BaseClassCPP(m_{{ c.Name }}) 
+	{
+	}	
+
+	//! Properties
+{% for fun in c.Properties -%}
+	virtual {{ fun.NativeType }} Get{{ fun.Name }}();
+	virtual void Set{{ fun.Name }}({{ fun.NativeType }} _Value);
+{% endfor -%}
+
+	//! Methods
+{% for fun in c.Functions -%}
+	virtual {{ fun.ReturnType }} {{ fun.Name }}({% parameters fun.Parameters %});
+{% endfor -%}
+
+	{{ c.Name }}^ InternalObject()
+	{
+		return m_{{ c.Name }};
+	}
+
+	virtual void Destroy()
+	{
+		delete this;
+	}
+
+private:
+	msclr::gcroot<{{ c.Name }}^> m_{{ c.Name }};
+};

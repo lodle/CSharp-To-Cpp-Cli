@@ -1,0 +1,30 @@
+﻿#pargma once
+
+using namespace {{ c.Namespace }};
+
+#include "{{ c.Name }}I.h"
+{% for header in c.Headers -%}
+#include "{{ header }}.h"
+{% endfor -%}
+
+ref class {{ c.Name }}Proxy : public virtual {{ c.Name }}I, public {{ c.BaseName }}, public {{ c.BaseName }}Proxy
+{
+public:
+	{{ c.Name }}Proxy({{ c.Name }}I* _{{ c.Name }})
+	{
+		m_{{ c.Name }} = _{{ c.Name }};
+	}
+
+	~{{ c.Name }}Proxy()
+	{
+		m_{{ c.Name }}->Destroy();
+	}
+	
+	//! Methods
+{% for fun in c.Functions -%}
+	virtual {{ fun.ReturnType }} {{ fun.Name }}({% parameters fun.Parameters %});
+{% endfor -%}
+
+private:
+	{{ c.Name }}I* m_{{ c.Name }};
+};

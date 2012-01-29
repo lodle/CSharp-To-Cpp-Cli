@@ -21,7 +21,7 @@ namespace CSharpToCppGenerator
                 return;
             }
 
-            WrapperGenerator gen = new WrapperGenerator { OutPath = args[1], DynamicLib = args[0] };
+            WrapperGenerator gen = new WrapperGenerator(args[1], args[0]);
 
             foreach (var type in gen.GetTypesWith<ExposeToCppAttribute>())
             {

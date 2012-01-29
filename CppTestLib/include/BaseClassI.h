@@ -1,28 +1,18 @@
 #pragma once
 
-#ifndef DLLFN
-	#ifndef DLL_EXPORT
-		#define DLLFN __declspec( dllimport )
-	#else
-		#define DLLFN __declspec( dllexport )
-	#endif
-#endif
+#include "NativeObjectI.h"
 
-
-class BaseClassI
+class DLLEXPORT BaseClassI : public NativeObjectI
 {
 public:
-	virtual int DoMoreStuff(const char* _strVal)=0;
+	//! Constructors
+	static BaseClassI* NewBaseClass();
 
-	virtual void ToString(char* szOutBuff, size_t nOutBuffSize)=0;
+	//! Static
+	static void StaticOne();
 
-	virtual int GetHashCode()=0;
+	//! Properties
 
+	//! Methods
+	virtual int DoMoreStuff(std::string _strVal)=0;
 };
-
-extern "C"
-{
-	DLLFN BaseClassI* NewBaseClass();
-
-	DLLFN void BaseClass_StaticOne();
-}
