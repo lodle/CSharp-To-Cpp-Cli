@@ -1,0 +1,30 @@
+﻿#pragma once
+
+#include "NativeObjectI.h"
+
+#include <xstring>
+#include <msclr\gcroot.h>
+#include <msclr\marshal.h>
+#include <msclr\marshal_cppstd.h>
+
+class NativeObjectCPP : public NativeObjectI
+{
+public:
+	NativeObjectCPP(System::Object^ _Internal)
+	{
+		m_Object = _Internal;
+	}		
+
+	virtual std::string ToString()
+	{
+		return msclr::interop::marshal_as<std::string>(m_Object->ToString());
+	}
+
+	virtual int GetHashCode()
+	{
+		return m_Object->GetHashCode();
+	}
+
+private:
+	msclr::gcroot<System::Object^> m_Object;
+};

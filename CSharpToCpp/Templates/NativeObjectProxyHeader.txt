@@ -1,0 +1,34 @@
+﻿#pragma once
+
+#include "NativeObjectI.h"
+
+#include <xstring>
+#include <msclr\marshal.h>
+#include <msclr\marshal_cppstd.h>
+
+ref class NativeObjectProxyCPP
+{
+public:
+	NativeObjectProxyCPP(NativeObjectProxyI *_Internal)
+	{
+		m_Object = _Internal;
+	}
+
+	virtual ~NativeObjectProxyCPP()
+	{
+		m_Object->Destroy();
+	}
+
+	virtual System::String^ ToString() override
+	{
+		return gcnew System::String(m_Object->ToString().c_str());
+	}
+
+	virtual int GetHashCode() override
+	{
+		return m_Object->GetHashCode();
+	}
+
+private:
+	NativeObjectProxyI* m_Object;
+};
