@@ -1,4 +1,11 @@
-﻿#define CPP_CLI_DLL
+﻿//////////////////////////////////////////////////////////////////////////
+//
+//	This file is auto generated using C# to C++ Generator
+//	https://github.com/lodle/CSharp-To-Cpp-Cli
+//
+//////////////////////////////////////////////////////////////////////////
+
+#define CPP_CLI_DLL
 
 #include "{{ c.Name }}.h"
 
@@ -9,9 +16,21 @@
 
 ////////////////////// Functions //////////////////////
 {% for fun in c.Functions -%}
-{{ fun.ReturnType }} {{ c.Name }}CPP::{{ fun.Name }}({% parameters fun.Parameters %})
+{{ fun.ReturnManagedType }} {{ c.Name }}CPP::{{ fun.Name }}({% parametersManaged fun.Parameters %})
 {
-
+	try
+	{
+{% if fun.IsVoidReturn == false -%}
+		{{ fun.ReturnNativeType }} _res = m_{{ c.Name }}->{{ fun.Name }}({% parametersCall fun.Parameters %});
+		return {{ fun.ReturnManagedName }};
+{% else -%}
+		m_{{ c.Name }}->{{ fun.Name }}({% parametersCall fun.Parameters %});
+{% endif -%}
+	}
+	catch (std::exception e)
+	{
+		throw gcnew System::Exception(gcnew System::String(e.what()));		
+	}
 }
 
 {% endfor -%}

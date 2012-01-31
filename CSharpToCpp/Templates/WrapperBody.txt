@@ -1,4 +1,11 @@
-﻿#define CPP_CLI_DLL
+﻿//////////////////////////////////////////////////////////////////////////
+//
+//	This file is auto generated using C# to C++ Generator
+//	https://github.com/lodle/CSharp-To-Cpp-Cli
+//
+//////////////////////////////////////////////////////////////////////////
+
+#define CPP_CLI_DLL
 
 #include "{{ c.Name }}.h"
 
@@ -8,24 +15,23 @@
 
 
 
-////////////////////// Constructors //////////////////////
+////////////////////// Static Constructors //////////////////////
 {% for con in c.Constructors -%}
 {{ c.Name }}I* {{ c.Name }}I::New{{ c.Name }}({% parameters con.Parameters %})
 {
 	return new {{ c.Name }}CPP(gcnew {{ c.Name }}({% parametersCall con.Parameters %}));
 }
-
 {% endfor -%}
 
 ////////////////////// Static Functions //////////////////////
 {% for fun in c.StaticFunctions -%}
-{{ fun.ReturnType }} {{ c.Name }}I::{{ fun.Name }}({% parameters fun.Parameters %})
+{{ fun.ReturnNativeType }} {{ c.Name }}I::{{ fun.Name }}({% parameters fun.Parameters %})
 {
 	try
 	{
 {% if fun.IsVoidReturn == false -%}
 		{{ fun.ReturnManagedType }} _res = {{ c.Name }}::{{ fun.Name }}({% parametersCall fun.Parameters %});
-		return {{ fun.ReturnName }};
+		return {{ fun.ReturnNativeName }};
 {% else -%}
 		{{ c.Name }}::{{ fun.Name }}({% parametersCall fun.Parameters %});
 {% endif -%}
@@ -40,32 +46,45 @@
 {% endfor -%}
 
 
+////////////////////// Constructors //////////////////////
+{% for con in c.Constructors -%}
+{{ c.Name }}CPP::{{ c.Name }}CPP({% parameters con.Parameters %}) 
+	: m_{{ c.Name }}(gcnew {{ c.Name }}({% parametersCall con.Parameters %})), 
+	{{ c.BaseName }}CPP(m_{{ c.Name }}) 
+{
+}
+{% endfor -%}
 
+{{ c.Name }}CPP::{{ c.Name }}CPP({{ c.Name }}^ _Internal) 
+	: m_{{ c.Name }}(_Internal), 
+	{{ c.BaseName }}CPP(m_{{ c.Name }}) 
+{
+}	
 
 ////////////////////// Propeties //////////////////////
 {% for fun in c.Properties -%}
 {{ fun.NativeType }} {{ c.Name }}CPP::Get{{ fun.Name }}()
 {
 	{{ fun.ReturnManagedType }} _res = m_{{ c.Name }}->{{ fun.Name }};
-	return {{ fun.ReturnName }};
+	return {{ fun.ReturnNativeName }};
 }
 
 void {{ c.Name }}CPP::Set{{ fun.Name }}({{ fun.NativeType }} _Value)
 {
-	m_{{ c.Name }}->{{ fun.Name }} = {{ fun.SetName }};
+	m_{{ c.Name }}->{{ fun.Name }} = {{ fun.SetManagedName }};
 }
 
 {% endfor -%}
 
 ////////////////////// Functions //////////////////////
 {% for fun in c.Functions -%}
-{{ fun.ReturnType }} {{ c.Name }}CPP::{{ fun.Name }}({% parameters fun.Parameters %})
+{{ fun.ReturnNativeType }} {{ c.Name }}CPP::{{ fun.Name }}({% parameters fun.Parameters %})
 {
 	try
 	{
 {% if fun.IsVoidReturn == false -%}
 		{{ fun.ReturnManagedType }} _res = m_{{ c.Name }}->{{ fun.Name }}({% parametersCall fun.Parameters %});
-		return {{ fun.ReturnName }};
+		return {{ fun.ReturnNativeName }};
 {% else -%}
 		m_{{ c.Name }}->{{ fun.Name }}({% parametersCall fun.Parameters %});
 {% endif -%}

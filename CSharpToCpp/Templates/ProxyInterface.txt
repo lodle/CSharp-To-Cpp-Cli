@@ -1,4 +1,11 @@
-﻿#pragma once
+﻿//////////////////////////////////////////////////////////////////////////
+//
+//	This file is auto generated using C# to C++ Generator
+//	https://github.com/lodle/CSharp-To-Cpp-Cli
+//
+//////////////////////////////////////////////////////////////////////////
+
+#pragma once
 
 #include "NativeObjectProxyI.h"
 {% for header in c.Headers -%}
@@ -10,6 +17,6 @@ class {{ c.Name }}I : public {{ c.BaseName }}I
 public:
 	//! Methods
 {% for fun in c.Functions -%}
-	virtual {{ fun.ReturnType }} {{ fun.Name }}({% parameters fun.Parameters %})=0;
+	virtual {{ fun.ReturnNativeType }} {{ fun.Name }}({% parameters fun.Parameters %})=0;
 {% endfor -%}
 };

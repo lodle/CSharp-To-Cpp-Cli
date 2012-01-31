@@ -44,9 +44,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CSharpToCpp\CSharpToCpp.csproj">
-      <Project>{4245B6C3-4DF3-491C-8434-A59BBC7C03BF}</Project>
-      <Name>CSharpToCpp</Name>
+    <ProjectReference Include="..\CSharpToCppInclude\CSharpToCppInclude.csproj">
+      <Project>{350788B8-6926-4207-9853-E28D45470E67}</Project>
+      <Name>CSharpToCppInclude</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

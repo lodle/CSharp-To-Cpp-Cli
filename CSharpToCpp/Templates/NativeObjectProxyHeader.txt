@@ -1,8 +1,18 @@
-﻿#pragma once
+﻿//////////////////////////////////////////////////////////////////////////
+//
+//	This file is auto generated using C# to C++ Generator
+//	https://github.com/lodle/CSharp-To-Cpp-Cli
+//
+//////////////////////////////////////////////////////////////////////////
+
+#pragma once
 
 #include "NativeObjectI.h"
 
 #include <xstring>
+
+//Need to include this here as marshal includes <gcroot.h> which removes the namespace from <msclr\gcroot.h>
+#include <msclr\gcroot.h>
 #include <msclr\marshal.h>
 #include <msclr\marshal_cppstd.h>
 

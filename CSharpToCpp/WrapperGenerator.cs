@@ -29,9 +29,12 @@ namespace CSharpToCpp
             Template.RegisterTag<ParametersCallTag>("parametersCall");
             Template.RegisterTag<FunctionCallTag>("functionCall");
             Template.RegisterTag<FunctionReturnTag>("functionReturn");
+            Template.RegisterTag<ParametersManagedTag>("parametersManaged");
+
 
             GenerateTemplate(null, "NativeObjectInterface.txt", OutPath + "\\include\\NativeObjectI.h");
             GenerateTemplate(null, "NativeObjectHeader.txt", OutPath + "\\code\\NativeObject.h");
+            GenerateTemplate(null, "NativeObjectBody.txt", OutPath + "\\code\\NativeObject.cpp");
 
             GenerateTemplate(null, "NativeObjectProxyInterface.txt", OutPath + "\\include\\NativeObjectProxyI.h");
             GenerateTemplate(null, "NativeObjectProxyHeader.txt", OutPath + "\\code\\NativeObjectProxy.h");
@@ -74,6 +77,13 @@ namespace CSharpToCpp
             }
 
             String output = _TemplateList[templateName].Render(Hash.FromAnonymousObject(new { c = gc }));
+
+            ////tfs issues
+            if (File.Exists(outPath))
+            {
+                File.SetAttributes(outPath, File.GetAttributes(outPath) & ~FileAttributes.ReadOnly);
+                File.Delete(outPath);
+            }
 
             using (StreamWriter outFile = new StreamWriter(outPath))
             {

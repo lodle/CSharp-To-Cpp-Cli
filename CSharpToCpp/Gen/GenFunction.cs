@@ -10,9 +10,11 @@ namespace CSharpToCpp.Gen
     public class GenFunction : GenConstructor
     {
         public String Name;
-        public String ReturnType;
+        public String ReturnNativeType;
         public String ReturnManagedType;
-        public String ReturnName;
+
+        public String ReturnManagedName;
+        public String ReturnNativeName;
 
         public bool IsVoidReturn;
         public MethodInfo Info;
@@ -22,10 +24,13 @@ namespace CSharpToCpp.Gen
             return Hash.FromAnonymousObject(new
             {
                 Name = Name,
+
                 IsVoidReturn = IsVoidReturn,
-                ReturnType = ReturnType,
+                ReturnNativeType = ReturnNativeType,
                 ReturnManagedType = ReturnManagedType,
-                ReturnName = ReturnName,
+                ReturnManagedName = ReturnManagedName,
+                ReturnNativeName = ReturnNativeName,
+
                 Parameters = Parameters
             });
         }
@@ -37,19 +42,12 @@ namespace CSharpToCpp.Gen
             Info = info;
 
             IsVoidReturn = info.ReturnParameter.ParameterType == typeof(void);
-            ReturnType = GenParameter.GetParameterNativeType(info.ReturnParameter.ParameterType);
 
-            if (info.ReturnParameter.ParameterType.IsClass)
-            {
-                ReturnManagedType = info.ReturnParameter.ParameterType.FullName.Replace(".", "::");
-                ReturnManagedType += "^";
-            }
-            else
-            {
-                ReturnManagedType = ReturnType;
-            }
+            ReturnNativeType = GenParameter.GetParameterNativeType(info.ReturnParameter.ParameterType);
+            ReturnManagedType = GenParameter.GetParameterManagedType(info.ReturnParameter.ParameterType);
 
-            ReturnName = GenParameter.GetParameterCallManagedName(gc.Name, "res", info.ReturnParameter.ParameterType);
+            ReturnManagedName = GenParameter.GetParameterManagedCallName(gc.Name, "res", info.ReturnParameter.ParameterType);
+            ReturnNativeName = GenParameter.GetParameterNativeCallName(gc.Name, "res", info.ReturnParameter.ParameterType);
         }
     }
 }

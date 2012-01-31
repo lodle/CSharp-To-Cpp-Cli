@@ -1,4 +1,11 @@
-﻿#pragma once
+﻿//////////////////////////////////////////////////////////////////////////
+//
+//	This file is auto generated using C# to C++ Generator
+//	https://github.com/lodle/CSharp-To-Cpp-Cli
+//
+//////////////////////////////////////////////////////////////////////////
+
+#pragma once
 
 using namespace {{ c.Namespace }};
 
@@ -16,13 +23,10 @@ class {{ c.Name }}CPP : public virtual {{ c.Name }}I, public {{ c.BaseName }}CPP
 {
 public:
 	//! Constructors
-	{{ c.Name }}CPP() : m_{{ c.Name }}(gcnew {{ c.Name }}()), {{ c.BaseName }}CPP(m_{{ c.Name }}) 
-	{
-	}
-
-	{{ c.Name }}CPP({{ c.Name }}^ _Internal) : m_{{ c.Name }}(_Internal), {{ c.BaseName }}CPP(m_{{ c.Name }}) 
-	{
-	}	
+{% for con in c.Constructors -%}
+	{{ c.Name }}CPP({% parameters con.Parameters %});
+{% endfor -%}
+	{{ c.Name }}CPP({{ c.Name }}^ _Internal);
 
 	//! Properties
 {% for fun in c.Properties -%}
@@ -32,7 +36,7 @@ public:
 
 	//! Methods
 {% for fun in c.Functions -%}
-	virtual {{ fun.ReturnType }} {{ fun.Name }}({% parameters fun.Parameters %});
+	virtual {{ fun.ReturnNativeType }} {{ fun.Name }}({% parameters fun.Parameters %});
 {% endfor -%}
 
 	{{ c.Name }}^ InternalObject()
@@ -53,6 +57,11 @@ public:
 	virtual std::string ToString()
 	{
 		return {{ c.BaseName }}CPP::ToString();
+	}
+
+	virtual bool Equals(NativeObjectI* pObject)
+	{
+		return {{ c.BaseName }}CPP::Equals(pObject);
 	}
 
 private:

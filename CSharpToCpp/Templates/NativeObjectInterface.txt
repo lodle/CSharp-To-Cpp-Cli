@@ -1,4 +1,11 @@
-﻿#pragma once
+﻿//////////////////////////////////////////////////////////////////////////
+//
+//	This file is auto generated using C# to C++ Generator
+//	https://github.com/lodle/CSharp-To-Cpp-Cli
+//
+//////////////////////////////////////////////////////////////////////////
+
+#pragma once
 
 #ifndef DLLEXPORT
 	#ifndef CPP_CLI_DLL
@@ -14,6 +21,10 @@
 class NativeObjectI
 {
 public:
+	virtual void Destroy()=0;
+
 	virtual std::string ToString()=0;
 	virtual int GetHashCode()=0;
+
+	virtual bool Equals(NativeObjectI* pObject)=0;
 };

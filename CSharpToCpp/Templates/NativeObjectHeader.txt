@@ -1,4 +1,11 @@
-﻿#pragma once
+﻿//////////////////////////////////////////////////////////////////////////
+//
+//	This file is auto generated using C# to C++ Generator
+//	https://github.com/lodle/CSharp-To-Cpp-Cli
+//
+//////////////////////////////////////////////////////////////////////////
+
+#pragma once
 
 #include "NativeObjectI.h"
 
@@ -23,6 +30,21 @@ public:
 	virtual int GetHashCode()
 	{
 		return m_Object->GetHashCode();
+	}
+
+	virtual bool Equals(NativeObjectI* pObject)
+	{
+		NativeObjectCPP* pReal = dynamic_cast<NativeObjectCPP*>(pObject);
+
+		if (!pReal)
+			return false;
+
+		return m_Object->Equals(pReal->m_Object);
+	}
+
+	virtual void Destroy()
+	{
+		delete this;
 	}
 
 private:

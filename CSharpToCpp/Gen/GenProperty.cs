@@ -12,15 +12,22 @@ namespace CSharpToCpp.Gen
         public PropertyInfo Info;
         public String Name;
         public String NativeType;
-        public String SetName;
+
+        public String SetNativeName;
+        public String SetManagedName;
+
         public String ReturnManagedType;
-        public String ReturnName;
+        public String ReturnNativeName;
+        public String ReturnManagedName;
 
         public GenProperty(GenClass gc, PropertyInfo info)
         {
             Info = info;
             Name = info.Name;
-            SetName = GenParameter.GetParameterCallName(gc.Name, "Value", info.PropertyType);
+
+            SetNativeName = GenParameter.GetParameterNativeCallName(gc.Name, "Value", info.PropertyType);
+            SetManagedName = GenParameter.GetParameterManagedCallName(gc.Name, "Value", info.PropertyType);
+
             NativeType = GenParameter.GetParameterNativeType(info.PropertyType);
 
             if (info.PropertyType.IsClass)
@@ -33,7 +40,8 @@ namespace CSharpToCpp.Gen
                 ReturnManagedType = NativeType;
             }
 
-            ReturnName = GenParameter.GetParameterCallManagedName(gc.Name, "res", info.PropertyType);
+            ReturnNativeName = GenParameter.GetParameterNativeCallName(gc.Name, "res", info.PropertyType);
+            ReturnManagedName = GenParameter.GetParameterManagedCallName(gc.Name, "res", info.PropertyType);
         }
 
         public object ToLiquid()
@@ -42,9 +50,13 @@ namespace CSharpToCpp.Gen
             {
                 Name = Name,
                 NativeType = NativeType,
-                SetName = SetName,
+
+                SetNativeName = SetNativeName,
+                SetManagedName = SetManagedName,
+
                 ReturnManagedType = ReturnManagedType,
-                ReturnName = ReturnName,
+                ReturnManagedName = ReturnManagedName,
+                ReturnNativeName = ReturnNativeName,
             });
         }
     }

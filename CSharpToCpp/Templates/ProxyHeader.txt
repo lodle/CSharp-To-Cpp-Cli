@@ -1,4 +1,11 @@
-﻿#pragma once
+﻿//////////////////////////////////////////////////////////////////////////
+//
+//	This file is auto generated using C# to C++ Generator
+//	https://github.com/lodle/CSharp-To-Cpp-Cli
+//
+//////////////////////////////////////////////////////////////////////////
+
+#pragma once
 
 using namespace {{ c.Namespace }};
 
@@ -9,7 +16,7 @@ using namespace {{ c.Namespace }};
 #include "{{ header }}.h"
 {% endfor -%}
 
-ref class {{ c.Name }}CPP : public {{ c.BaseName }}CPP, {{ c.ManagedName }}
+ref class {{ c.Name }}CPP : public {{ c.BaseName }}CPP, public {{ c.ManagedName }}
 {
 public:
 	{{ c.Name }}CPP({{ c.Name }}I* _{{ c.Name }}) : {{ c.BaseName }}CPP(_{{ c.Name }})
@@ -19,7 +26,7 @@ public:
 	
 	//! Methods
 {% for fun in c.Functions -%}
-	virtual {{ fun.ReturnType }} {{ fun.Name }}({% parameters fun.Parameters %});
+	virtual {{ fun.ReturnManagedType }} {{ fun.Name }}({% parametersManaged fun.Parameters %});
 {% endfor -%}
 
 private:

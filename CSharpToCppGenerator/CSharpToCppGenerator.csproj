@@ -55,6 +55,10 @@
       <Project>{214729AC-A7CA-4060-BE31-298066F6B327}</Project>
       <Name>CSharpTestLib</Name>
     </ProjectReference>
+    <ProjectReference Include="..\CSharpToCppInclude\CSharpToCppInclude.csproj">
+      <Project>{350788B8-6926-4207-9853-E28D45470E67}</Project>
+      <Name>CSharpToCppInclude</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CSharpToCpp\CSharpToCpp.csproj">
       <Project>{4245B6C3-4DF3-491C-8434-A59BBC7C03BF}</Project>
       <Name>CSharpToCpp</Name>

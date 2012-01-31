@@ -10,6 +10,8 @@ namespace CSharpToCpp.Gen
     public class GenParameter : ILiquidizable
     {
         public String NativeType;
+        public String ManagedType;
+
         public String Name;
         public String CallName;
 
@@ -23,6 +25,7 @@ namespace CSharpToCpp.Gen
                 Name = Name,
                 CallName = CallName,
                 NativeType = NativeType,
+                ManagedType = ManagedType,
             });
         }
 
@@ -32,23 +35,16 @@ namespace CSharpToCpp.Gen
             Type = info.ParameterType;
             Name = info.Name;
 
+            ManagedType = GetParameterManagedType(Type);
+            NativeType = GetParameterNativeType(Type);
+
             if (gc.Type.IsInterface)
-            {
-                NativeType = info.ParameterType.FullName.Replace(".", "::");
-
-                if (info.ParameterType.IsClass)
-                    NativeType += "^";
-
-                CallName = "Blah!";
-            }
+                CallName = GetParameterNativeCallName(gc.Name, info.Name, info.ParameterType);
             else
-            {
-                NativeType = GetParameterNativeType(Type);
-                CallName = GetParameterCallName(gc.Name, info.Name, info.ParameterType);
-            }
+                CallName = GetParameterManagedCallName(gc.Name, info.Name, info.ParameterType);
         }
 
-        static public string GetParameterCallName(String className, String paramName, Type paramType)
+        static public string GetParameterManagedCallName(String className, String paramName, Type paramType)
         {
             if (paramType == typeof(String))
                 return String.Format("gcnew System::String(_{0}.c_str())", paramName);
@@ -61,14 +57,14 @@ namespace CSharpToCpp.Gen
         }
 
 
-        static public string GetParameterCallManagedName(String className, String paramName, Type paramType)
+        static public string GetParameterNativeCallName(String className, String paramName, Type paramType)
         {
             if (paramType == typeof(String))
                 return String.Format("msclr::interop::marshal_as<std::string>(_{0})", paramName);
+            //else if (paramType.IsInterface)
+            //    return String.Format("new {0}CPP(_{1})", paramType.Name, paramName);
             else if (paramType.IsClass)
                 return String.Format("new {0}CPP(_{1})", paramType.Name, paramName);
-            else if (paramType.IsInterface)
-                return String.Format("new {0}ProxyCPP(_{1})", paramType.Name, paramName);
 
             return String.Format("_{0}", paramName);
         }
@@ -115,7 +111,43 @@ namespace CSharpToCpp.Gen
             return "[FAIL]";
         }
 
+        static public String GetParameterManagedType(Type parameterType)
+        {
+            if (parameterType == typeof(String))
+            {
+                return "System::String^";
+            }
+            else if (parameterType == typeof(Int32))
+            {
+                return "int";
+            }
+            else if (parameterType == typeof(Double))
+            {
+                return "double";
+            }
+            else if (parameterType == typeof(Boolean))
+            {
+                return "bool";
+            }
+            else if (parameterType == typeof(Object))
+            {
+                return "System::Object^";
+            }
+            else if (parameterType.ContainsGenericParameters)
+            {
+                int a = 1;
+            }
+            else if (parameterType.IsClass || parameterType.IsInterface)
+            {
+                return parameterType.FullName.Replace(".", "::") + "^";
+            }
+            else if (parameterType == typeof(void))
+            {
+                return "void";
+            }
 
+            return "[FAIL]";
+        }
     }
 
 }

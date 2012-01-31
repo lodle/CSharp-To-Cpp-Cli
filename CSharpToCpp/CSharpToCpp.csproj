@@ -43,7 +43,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ExposeToCppAttribute.cs" />
     <Compile Include="FunctionCallTag.cs" />
     <Compile Include="Gen\GenClass.cs" />
     <Compile Include="Gen\GenConstructor.cs" />
@@ -58,6 +57,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Templates\NativeObjectBody.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Templates\NativeObjectHeader.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
