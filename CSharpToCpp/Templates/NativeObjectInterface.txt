@@ -23,8 +23,50 @@ class NativeObjectI
 public:
 	virtual void Destroy()=0;
 
-	virtual std::string ToString()=0;
+	virtual void ToString(char* szBuff, int nBuffSize)=0;
 	virtual int GetHashCode()=0;
 
 	virtual bool Equals(NativeObjectI* pObject)=0;
+
+	virtual bool HasError()=0;
+	virtual void GetLastError(char* szBuff, int nBuffSize)=0;
+};
+
+class CNativeObject
+{
+public:
+	CNativeObject(NativeObjectI* pObject)
+	{
+		m_pObject = pObject;
+	}
+
+	virtual std::string ToString()
+	{
+		char szBuff[255] = {0};
+		m_pObject->ToString(szBuff, 255);
+		return std::string(szBuff);
+	}
+
+	virtual int GetHashCode()
+	{
+		return m_pObject->GetHashCode();
+	}
+
+	virtual bool Equals(NativeObjectI* pObject)
+	{
+		return m_pObject->Equals(pObject);
+	}
+
+	void CheckForError()
+	{
+		if (!m_pObject->HasError())
+			return;
+
+		char szBuff[255] = {0};
+		m_pObject->GetLastError(szBuff, 255);
+		throw std::exception(szBuff, 255);
+	}
+
+private:
+	NativeObjectI* m_pObject;
 };

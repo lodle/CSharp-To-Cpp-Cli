@@ -19,6 +19,7 @@ using namespace {{ c.Namespace }};
 #include <msclr\gcroot.h>
 
 
+
 class {{ c.Name }}CPP : public virtual {{ c.Name }}I, public {{ c.BaseName }}CPP
 {
 public:
@@ -29,14 +30,19 @@ public:
 	{{ c.Name }}CPP({{ c.Name }}^ _Internal);
 
 	//! Properties
-{% for fun in c.Properties -%}
-	virtual {{ fun.NativeType }} Get{{ fun.Name }}();
-	virtual void Set{{ fun.Name }}({{ fun.NativeType }} _Value);
+{% for prop in c.Properties -%}
+{% if prop.IsString == true -%}
+	virtual void Get{{ prop.Name }}(char* szBuff, int nBuffSize);
+	virtual void Set{{ prop.Name }}(const char* szBuff, int nBuffSize);
+{% else %}
+	virtual {{ prop.NativeType }} Get{{ prop.Name }}();
+	virtual void Set{{ prop.Name }}({{ prop.NativeType }} _Value);
+{% endif -%}
 {% endfor -%}
 
 	//! Methods
 {% for fun in c.Functions -%}
-	virtual {{ fun.ReturnNativeType }} {{ fun.Name }}({% parameters fun.Parameters %});
+	virtual {{ fun.ReturnNativeType }} {{ fun.Name }}({% parameters fun.Parameters NativeToManaged %});
 {% endfor -%}
 
 	{{ c.Name }}^ InternalObject()
@@ -54,15 +60,26 @@ public:
 		return {{ c.BaseName }}CPP::GetHashCode();
 	}
 	
-	virtual std::string ToString()
+	virtual void ToString(char* szBuff, int nBuffSize)
 	{
-		return {{ c.BaseName }}CPP::ToString();
+		return {{ c.BaseName }}CPP::ToString(szBuff, nBuffSize);
 	}
 
 	virtual bool Equals(NativeObjectI* pObject)
 	{
 		return {{ c.BaseName }}CPP::Equals(pObject);
 	}
+
+	virtual bool HasError()
+	{
+		return {{ c.BaseName }}CPP::HasError();
+	}
+
+	virtual void GetLastError(char* szBuff, int nBuffSize)
+	{
+		{{ c.BaseName }}CPP::GetLastError(szBuff, nBuffSize);
+	}
+
 
 private:
 	msclr::gcroot<{{ c.Name }}^> m_{{ c.Name }};

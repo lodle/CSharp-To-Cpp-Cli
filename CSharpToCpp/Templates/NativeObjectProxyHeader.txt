@@ -31,12 +31,28 @@ public:
 
 	virtual System::String^ ToString() override
 	{
-		return gcnew System::String(m_Object->ToString().c_str());
+		char szBuff[255] = {0};
+		m_Object->ToString(szBuff, 255);
+
+		return gcnew System::String(szBuff);
 	}
 
 	virtual int GetHashCode() override
 	{
 		return m_Object->GetHashCode();
+	}
+
+	bool HasError()
+	{
+		return m_Object->HasError();
+	}
+
+	std::string GetLastError()
+	{
+		char szError[255] = {0};
+		m_Object->GetLastError(szError, 255);
+
+		return std::string(szError, 255);
 	}
 
 private:

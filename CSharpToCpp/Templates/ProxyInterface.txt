@@ -17,6 +17,74 @@ class {{ c.Name }}I : public {{ c.BaseName }}I
 public:
 	//! Methods
 {% for fun in c.Functions -%}
-	virtual {{ fun.ReturnNativeType }} {{ fun.Name }}({% parameters fun.Parameters %})=0;
+{% if fun.IsStringReturn -%}
+	virtual void {{ fun.Name }}(char* szRetBuff, int nRetBuffSize, {% parameters fun.Parameters NativeInternal %})=0;
+{% else -%}
+	virtual {{ fun.ReturnNativeType }} {{ fun.Name }}({% parameters fun.Parameters NativeInternal %})=0;
+{% endif -%}
 {% endfor -%}
+};
+
+
+class C{{ c.Name }} : public virtual {{ c.Name }}I, public C{{ c.BaseName }}
+{
+public:
+{% for fun in c.Functions -%}
+	virtual {{ fun.ReturnNativeType }} Do{{ fun.Name }}({% parameters fun.Parameters NativeExternal %})=0;
+{% endfor %}
+
+protected:
+{% for fun in c.Functions -%}
+{% if fun.IsStringReturn -%}
+	virtual void {{ fun.Name }}(char* szRetBuff, int nRetBuffSize, {% parameters fun.Parameters NativeInternal %})
+{% else -%}
+	virtual {{ fun.ReturnNativeType }} {{ fun.Name }}({% parameters fun.Parameters NativeInternal %})
+{% endif -%}
+	{
+		m_szLastError = "";
+		{% parametersCall fun.Parameters InternalToExternalSetup %}
+
+		try
+		{
+{% if fun.IsStringReturn -%}
+			std::string ret = Do{{ fun.Name }}({% parametersCall fun.Parameters InternalToExternal %});
+			strncpy_s(szRetBuff, nRetBuffSize, ret.c_str(), ret.size());
+{% elseif fun.IsVoidReturn == false -%}
+			return Do{{ fun.Name }}({% parametersCall fun.Parameters InternalToExternal %});
+{% else -%}
+			Do{{ fun.Name }}({% parametersCall fun.Parameters InternalToExternal %});
+{% endif -%}
+		}
+		catch (std::exception &e)
+		{
+			m_szLastError = e.what();
+		}
+	}
+
+{% endfor -%}
+
+	virtual bool HasError()
+	{
+		return C{{ c.BaseName }}::HasError();
+	}
+
+	virtual void GetLastError(char* szBuff, int nBuffSize)
+	{
+		C{{ c.BaseName }}::GetLastError(szBuff, nBuffSize);
+	}
+
+	virtual void Destroy()
+	{
+		C{{ c.BaseName }}::Destroy();
+	}
+
+	virtual void ToString(char* szBuff, int nBuffSize)
+	{
+		C{{ c.BaseName }}::ToString(szBuff, nBuffSize);
+	}
+
+	virtual int GetHashCode()
+	{
+		return C{{ c.BaseName }}::GetHashCode();
+	}
 };

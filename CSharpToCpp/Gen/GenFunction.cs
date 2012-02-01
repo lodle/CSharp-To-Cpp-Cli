@@ -16,7 +16,10 @@ namespace CSharpToCpp.Gen
         public String ReturnManagedName;
         public String ReturnNativeName;
 
+        public String NameUnique;
+
         public bool IsVoidReturn;
+        public bool IsStringReturn;
         public MethodInfo Info;
 
         public override object ToLiquid()
@@ -26,11 +29,13 @@ namespace CSharpToCpp.Gen
                 Name = Name,
 
                 IsVoidReturn = IsVoidReturn,
+                IsStringReturn = IsStringReturn,
                 ReturnNativeType = ReturnNativeType,
                 ReturnManagedType = ReturnManagedType,
                 ReturnManagedName = ReturnManagedName,
                 ReturnNativeName = ReturnNativeName,
 
+                NameUnique = NameUnique,
                 Parameters = Parameters
             });
         }
@@ -41,7 +46,20 @@ namespace CSharpToCpp.Gen
             Name = info.Name;
             Info = info;
 
+            NameUnique = Name;
+
+            int nCount = 0;
+            foreach (var fun in gc.Functions)
+            {
+                if (fun.Name == Name)
+                    nCount++;
+            }
+
+            if (nCount > 0)
+                NameUnique += nCount.ToString();
+
             IsVoidReturn = info.ReturnParameter.ParameterType == typeof(void);
+            IsStringReturn = info.ReturnParameter.ParameterType == typeof(String);
 
             ReturnNativeType = GenParameter.GetParameterNativeType(info.ReturnParameter.ParameterType);
             ReturnManagedType = GenParameter.GetParameterManagedType(info.ReturnParameter.ParameterType);

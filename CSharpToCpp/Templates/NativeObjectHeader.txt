@@ -22,9 +22,10 @@ public:
 		m_Object = _Internal;
 	}		
 
-	virtual std::string ToString()
+	virtual void ToString(char* szBuff, int nBuffSize)
 	{
-		return msclr::interop::marshal_as<std::string>(m_Object->ToString());
+		std::string szRes = msclr::interop::marshal_as<std::string>(m_Object->ToString());
+		strncpy_s(szBuff, nBuffSize, szRes.c_str(), szRes.size());
 	}
 
 	virtual int GetHashCode()
@@ -46,6 +47,19 @@ public:
 	{
 		delete this;
 	}
+
+	virtual bool HasError()
+	{
+		return m_szLastError.size() > 0;
+	}
+
+	virtual void GetLastError(char* szBuff, int nBuffSize)
+	{
+		strncpy_s(szBuff, nBuffSize, m_szLastError.c_str(), m_szLastError.size());
+	}
+
+protected:
+	std::string m_szLastError;
 
 private:
 	msclr::gcroot<System::Object^> m_Object;

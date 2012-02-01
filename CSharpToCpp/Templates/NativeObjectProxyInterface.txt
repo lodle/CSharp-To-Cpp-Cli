@@ -23,6 +23,46 @@ class NativeObjectProxyI
 public:
 	virtual void Destroy()=0;
 
-	virtual std::string ToString()=0;
+	virtual void ToString(char* szBuff, int nBuffSize)=0;
 	virtual int GetHashCode()=0;
+
+	virtual bool HasError()=0;
+	virtual void GetLastError(char* szBuff, int nBuffSize)=0;
+};
+
+class CNativeObjectProxy : public virtual NativeObjectProxyI
+{
+public:
+	virtual void DoDestroy()=0;
+	virtual std::string DoToString()=0;
+	virtual int DoGetHashCode()=0;
+
+protected:
+	virtual bool HasError()
+	{
+		return m_szLastError.size() > 0;
+	}
+
+	virtual void GetLastError(char* szBuff, int nBuffSize)
+	{
+		strncpy_s(szBuff, nBuffSize, m_szLastError.c_str(), m_szLastError.size());
+	}
+
+	virtual void Destroy()
+	{
+		DoDestroy();
+	}
+
+	virtual void ToString(char* szBuff, int nBuffSize)
+	{
+		std::string res = DoToString();
+		strncpy_s(szBuff, nBuffSize, res.c_str(), res.size());
+	}
+
+	virtual int GetHashCode()
+	{
+		return DoGetHashCode();
+	}
+
+	std::string m_szLastError;
 };

@@ -18,19 +18,24 @@
 {% for fun in c.Functions -%}
 {{ fun.ReturnManagedType }} {{ c.Name }}CPP::{{ fun.Name }}({% parametersManaged fun.Parameters %})
 {
-	try
-	{
-{% if fun.IsVoidReturn == false -%}
-		{{ fun.ReturnNativeType }} _res = m_{{ c.Name }}->{{ fun.Name }}({% parametersCall fun.Parameters %});
-		return {{ fun.ReturnManagedName }};
+{% parametersCall fun.Parameters ManagedToNativeSetup -%}
+{% if fun.IsStringReturn -%}
+	char _szresBuff[255] = {0};
+	int _nresSize = 255;
+
+	m_{{ c.Name }}->{{ fun.Name }}(_szresBuff, _nresSize, {% parametersCall fun.Parameters ManagedToNative %});
+{% elseif fun.IsVoidReturn == false -%}
+	{{ fun.ReturnNativeType }} _res = m_{{ c.Name }}->{{ fun.Name }}({% parametersCall fun.Parameters ManagedToNative %});
 {% else -%}
-		m_{{ c.Name }}->{{ fun.Name }}({% parametersCall fun.Parameters %});
+	m_{{ c.Name }}->{{ fun.Name }}({% parametersCall fun.Parameters ManagedToNative %});
 {% endif -%}
-	}
-	catch (std::exception e)
-	{
-		throw gcnew System::Exception(gcnew System::String(e.what()));		
-	}
+
+	if (HasError())
+		throw gcnew System::Exception(gcnew System::String(GetLastError().c_str()));
+{% if fun.IsVoidReturn == false -%}
+
+	return {{ fun.ReturnManagedName }};
+{% endif -%}
 }
 
 {% endfor -%}

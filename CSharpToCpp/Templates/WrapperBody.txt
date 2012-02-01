@@ -13,21 +13,19 @@
 #include <msclr\marshal.h>
 #include <msclr\marshal_cppstd.h>
 
-
-
-////////////////////// Static Constructors //////////////////////
-{% for con in c.Constructors -%}
-{{ c.Name }}I* {{ c.Name }}I::New{{ c.Name }}({% parameters con.Parameters %})
+extern "C"
 {
-	return new {{ c.Name }}CPP(gcnew {{ c.Name }}({% parametersCall con.Parameters %}));
-}
+	////////////////////// Static Constructors //////////////////////
+{% for con in c.Constructors -%}
+	{{ c.Name }}I* New{{ con.NameUnique }}({% parameters con.Parameters %})
+	{
+		return new {{ c.Name }}CPP(gcnew {{ c.Name }}({% parametersCall con.Parameters %}));
+	}
 {% endfor -%}
 
-////////////////////// Static Functions //////////////////////
+	////////////////////// Static Functions //////////////////////
 {% for fun in c.StaticFunctions -%}
-{{ fun.ReturnNativeType }} {{ c.Name }}I::{{ fun.Name }}({% parameters fun.Parameters %})
-{
-	try
+{{ fun.ReturnNativeType }} {{ fun.NameUnique }}({% parameters fun.Parameters %})
 	{
 {% if fun.IsVoidReturn == false -%}
 		{{ fun.ReturnManagedType }} _res = {{ c.Name }}::{{ fun.Name }}({% parametersCall fun.Parameters %});
@@ -36,15 +34,8 @@
 		{{ c.Name }}::{{ fun.Name }}({% parametersCall fun.Parameters %});
 {% endif -%}
 	}
-	catch (System::Exception^ e)
-	{
-		std::string msg = msclr::interop::marshal_as<std::string>(e->Message);
-		throw std::exception(msg.c_str());		
-	}
-}
-
 {% endfor -%}
-
+}
 
 ////////////////////// Constructors //////////////////////
 {% for con in c.Constructors -%}
@@ -62,37 +53,59 @@
 }	
 
 ////////////////////// Propeties //////////////////////
-{% for fun in c.Properties -%}
-{{ fun.NativeType }} {{ c.Name }}CPP::Get{{ fun.Name }}()
+{% for prop in c.Properties -%}
+{% if prop.IsString == true -%}
+void {{ c.Name }}CPP::Get{{ prop.Name }}(char* szBuff, int nBuffSize)
 {
-	{{ fun.ReturnManagedType }} _res = m_{{ c.Name }}->{{ fun.Name }};
-	return {{ fun.ReturnNativeName }};
+	{{ prop.ReturnManagedType }} _res = m_{{ c.Name }}->{{ prop.Name }};
+	std::string szRes = {{ prop.ReturnNativeName }};
+	strncpy_s(szBuff, nBuffSize, szRes.c_str(), szRes.size());
 }
 
-void {{ c.Name }}CPP::Set{{ fun.Name }}({{ fun.NativeType }} _Value)
+void {{ c.Name }}CPP::Set{{ prop.Name }}(const char* _szValueBuff, int _nValueSize)
 {
-	m_{{ c.Name }}->{{ fun.Name }} = {{ fun.SetManagedName }};
+	m_{{ c.Name }}->{{ prop.Name }} = {{ prop.SetManagedName }};
 }
+{% else -%}
+{{ prop.NativeType }} {{ c.Name }}CPP::Get{{ prop.Name }}()
+{
+	{{ prop.ReturnManagedType }} _res = m_{{ c.Name }}->{{ prop.Name }};
+	return {{ prop.ReturnNativeName }};
+}
+
+void {{ c.Name }}CPP::Set{{ prop.Name }}({{ prop.NativeType }} _Value)
+{
+	m_{{ c.Name }}->{{ prop.Name }} = {{ prop.SetManagedName }};
+}
+{% endif %}
 
 {% endfor -%}
 
 ////////////////////// Functions //////////////////////
 {% for fun in c.Functions -%}
-{{ fun.ReturnNativeType }} {{ c.Name }}CPP::{{ fun.Name }}({% parameters fun.Parameters %})
+{% if fun.IsStringReturn -%}
+void {{ c.Name }}CPP::{{ fun.Name }}(char* szRetBuff, int nRetBuffSize, {% parameters fun.Parameters NativeToManaged %})
+{% else -%}
+{{ fun.ReturnNativeType }} {{ c.Name }}CPP::{{ fun.Name }}({% parameters fun.Parameters NativeToManaged %})
+{% endif -%}
 {
+	m_szLastError = "";
+
 	try
 	{
-{% if fun.IsVoidReturn == false -%}
-		{{ fun.ReturnManagedType }} _res = m_{{ c.Name }}->{{ fun.Name }}({% parametersCall fun.Parameters %});
+{% if fun.IsStringReturn -%}
+		std::string szRet = m_pInterface->{{ fun.Name }}(szBuff, 255, {% parametersCall fun.Parameters NativeToManaged %});
+		strncpy_s(szRetBuff, nRetBuffSize, szRet.c_str(), szRet.size());
+{% elseif fun.IsVoidReturn == false -%}
+		{{ fun.ReturnManagedType }} _res = m_{{ c.Name }}->{{ fun.Name }}({% parametersCall fun.Parameters NativeToManaged %});
 		return {{ fun.ReturnNativeName }};
 {% else -%}
-		m_{{ c.Name }}->{{ fun.Name }}({% parametersCall fun.Parameters %});
+		m_{{ c.Name }}->{{ fun.Name }}({% parametersCall fun.Parameters NativeToManaged %});
 {% endif -%}
 	}
 	catch (System::Exception^ e)
 	{
-		std::string msg = msclr::interop::marshal_as<std::string>(e->Message);
-		throw std::exception(msg.c_str());		
+		m_szLastError = msclr::interop::marshal_as<std::string>(e->Message);	
 	}
 }
 

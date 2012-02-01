@@ -12,27 +12,137 @@
 #include "{{ header }}I.h"
 {% endfor -%}
 
-class DLLEXPORT {{ c.Name }}I : public {{ c.BaseName }}I
+class {{ c.Name }}I : public {{ c.BaseName }}I
 {
 public:
-	//! Constructors
-{% for con in c.Constructors -%}
-	static {{ c.Name }}I* New{{ c.Name }}({% parameters con.Parameters %});
-{% endfor -%}
-
-	//! Static
-{% for fun in c.StaticFunctions -%}
-	static {{ fun.ReturnNativeType }} {{ fun.Name }}({% parameters fun.Parameters %});
-{% endfor -%}
-
 	//! Properties
-{% for fun in c.Properties -%}
-	virtual {{ fun.NativeType }} Get{{ fun.Name }}()=0;
-	virtual void Set{{ fun.Name }}({{ fun.NativeType }} _Value)=0;
+{% for prop in c.Properties -%}
+{% if prop.IsString == true -%}
+	virtual void Get{{ prop.Name }}(char* szBuff, int nBuffSize)=0;
+	virtual void Set{{ prop.Name }}(const char* szBuff, int nBuffSize)=0;
+{% else %}
+	virtual {{ prop.NativeType }} Get{{ prop.Name }}()=0;
+	virtual void Set{{ prop.Name }}({{ prop.NativeType }} _Value)=0;
+{% endif -%}
 {% endfor -%}
 
 	//! Methods
 {% for fun in c.Functions -%}
-	virtual {{ fun.ReturnNativeType }} {{ fun.Name }}({% parameters fun.Parameters %})=0;
+	virtual {{ fun.ReturnNativeType }} {{ fun.Name }}({% parameters fun.Parameters NativeToManaged %})=0;
 {% endfor -%}
 };
+
+
+extern "C"
+{
+	//! Constructors
+{% for con in c.Constructors -%}
+	DLLEXPORT {{ c.Name }}I* New{{ con.NameUnique }}({% parameters con.Parameters %});
+{% endfor -%}
+
+	//! Static
+{% for fun in c.StaticFunctions -%}
+	DLLEXPORT {{ fun.ReturnNativeType }} {{ fun.NameUnique }}({% parameters fun.Parameters %});
+{% endfor -%}
+}
+
+
+
+//This exists due to issues sending strings and exceptions from vis 2008 to vis 2010
+class C{{ c.Name }} : public C{{ c.BaseName }}
+{
+public:
+	//! Constructors
+{% for con in c.Constructors -%}
+	C{{ c.Name }}({% parameters con.Parameters %}) : 
+		m_pInterface(New{{ con.NameUnique }}({% parametersCall con.Parameters NativeToNative %})), 
+		C{{ c.BaseName }}(m_pInterface)
+	{
+	}
+
+{% endfor -%}
+	C{{ c.Name }}({{ c.Name }}I* pInterface) :
+		m_pInterface(pInterface), 
+		C{{ c.BaseName }}(m_pInterface)
+	{
+	}
+
+	~C{{ c.Name }}()
+	{
+		m_pInterface->Destroy();
+	}
+
+	operator {{ c.Name }}I*()
+	{
+		return m_pInterface;
+	}
+
+	//! Static
+{% for fun in c.StaticFunctions -%}
+	static {{ fun.ReturnNativeType }} {{ fun.Name }}({% parameters fun.Parameters %})
+	{
+{% if fun.IsStringReturn -%}
+		char szBuff[255] = {0};
+		m_pInterface->{{ fun.Name }}(szBuff, 255, {% parametersCall fun.Parameters NativeToNative %});
+		return std::string(szBuff);
+{% elseif fun.IsVoidReturn == false -%}
+		{{ fun.ReturnNativeType }} _res = {{ fun.NameUnique }}({% parametersCall fun.Parameters NativeToNative %});
+		return {{ fun.ReturnNativeName }};
+{% else -%}
+		{{ fun.NameUnique }}({% parametersCall fun.Parameters NativeToNative%});
+{% endif -%}
+	}
+{% endfor -%}
+
+	//! Properties
+{% for prop in c.Properties -%}
+{% if prop.IsString == true -%}
+	virtual {{ prop.NativeType }} Get{{ prop.Name }}()
+	{
+		char szBuff[255] = {0};
+		m_pInterface->Get{{ prop.Name }}(szBuff, 255);
+		return std::string(szBuff);
+	}
+
+	virtual void Set{{ prop.Name }}({{ prop.NativeType }} _Value)
+	{
+		m_pInterface->Set{{ prop.Name }}(_Value.c_str(), _Value.size());
+	}
+{% else -%}
+	virtual {{ prop.NativeType }} Get{{ prop.Name }}()
+	{
+		return m_pInterface->Get{{ prop.Name }}();
+	}
+
+	virtual void Set{{ prop.Name }}({{ prop.NativeType }} _Value)
+	{
+		m_pInterface->Set{{ prop.Name }}(_Value);
+	}
+{% endif -%}
+
+{% endfor -%}
+	//! Methods
+{% for fun in c.Functions -%}
+	virtual {{ fun.ReturnNativeType }} {{ fun.Name }}({% parameters fun.Parameters %})
+	{
+{% if fun.IsStringReturn -%}
+		char szBuff[255] = {0};
+		m_pInterface->{{ fun.Name }}(szBuff, 255, {% parametersCall fun.Parameters NativeToNative %});
+{% elseif fun.IsVoidReturn == false -%}
+		{{ fun.ReturnNativeType }} _res = m_pInterface->{{ fun.Name }}({% parametersCall fun.Parameters NativeToNative %});
+{% else -%}
+		m_pInterface->{{ fun.Name }}({% parametersCall fun.Parameters NativeToNative %});
+{% endif -%}
+		CheckForError();
+{% if fun.IsStringReturn -%}
+		return std::string(szBuff);
+{% elseif fun.IsVoidReturn == false -%}
+		return _res;
+{% endif -%}
+	}
+
+{% endfor -%}
+private:
+	{{ c.Name }}I* m_pInterface;
+};
+

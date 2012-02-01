@@ -33,21 +33,23 @@ namespace CSharpToCpp.Gen
         {
             Info = info;
             Type = info.ParameterType;
+
             Name = info.Name;
+            Name = Char.ToUpper(Name[0]) + Name.Substring(1);
 
             ManagedType = GetParameterManagedType(Type);
             NativeType = GetParameterNativeType(Type);
 
             if (gc.Type.IsInterface)
-                CallName = GetParameterNativeCallName(gc.Name, info.Name, info.ParameterType);
+                CallName = GetParameterNativeCallName(gc.Name, Name, info.ParameterType);
             else
-                CallName = GetParameterManagedCallName(gc.Name, info.Name, info.ParameterType);
+                CallName = GetParameterManagedCallName(gc.Name, Name, info.ParameterType);
         }
 
         static public string GetParameterManagedCallName(String className, String paramName, Type paramType)
         {
             if (paramType == typeof(String))
-                return String.Format("gcnew System::String(_{0}.c_str())", paramName);
+                return String.Format("gcnew System::String(std::string(_sz{0}Buff, _n{0}Size).c_str())", paramName);
             else if (paramType.IsClass)
                 return String.Format("(({0}*)_{1})->InternalObject()", paramName, className);
             else if (paramType.IsInterface)

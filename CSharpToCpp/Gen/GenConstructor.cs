@@ -11,12 +11,13 @@ namespace CSharpToCpp.Gen
     {
         public List<GenParameter> Parameters = new List<GenParameter>();
         public ConstructorInfo Info;
+        public String NameUnique;
 
         public virtual object ToLiquid()
         {
             return Hash.FromAnonymousObject(new
             {
-
+                NameUnique = NameUnique,
                 Parameters = Parameters
             });
         }
@@ -31,6 +32,11 @@ namespace CSharpToCpp.Gen
             : this(gc, info as MethodBase)
         {
             Info = info;
+
+            NameUnique = gc.Name;
+
+            if (gc.Constructors.Count() > 0)
+                NameUnique += gc.Constructors.Count().ToString();
         }
     }
 }

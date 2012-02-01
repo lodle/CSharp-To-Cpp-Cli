@@ -20,6 +20,8 @@ namespace CSharpToCpp.Gen
         public String ReturnNativeName;
         public String ReturnManagedName;
 
+        public bool IsString;
+
         public GenProperty(GenClass gc, PropertyInfo info)
         {
             Info = info;
@@ -29,6 +31,7 @@ namespace CSharpToCpp.Gen
             SetManagedName = GenParameter.GetParameterManagedCallName(gc.Name, "Value", info.PropertyType);
 
             NativeType = GenParameter.GetParameterNativeType(info.PropertyType);
+            IsString = (info.PropertyType == typeof(String));
 
             if (info.PropertyType.IsClass)
             {
@@ -57,6 +60,8 @@ namespace CSharpToCpp.Gen
                 ReturnManagedType = ReturnManagedType,
                 ReturnManagedName = ReturnManagedName,
                 ReturnNativeName = ReturnNativeName,
+
+                IsString = IsString,
             });
         }
     }
