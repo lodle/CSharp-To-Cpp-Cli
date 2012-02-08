@@ -64,7 +64,7 @@ namespace CSharpToCpp.Gen
             ReturnNativeType = GenParameter.GetParameterNativeType(info.ReturnParameter.ParameterType);
             ReturnManagedType = GenParameter.GetParameterManagedType(info.ReturnParameter.ParameterType);
 
-            ReturnManagedName = GenParameter.GetParameterManagedCallName(gc.Name, "res", info.ReturnParameter.ParameterType);
+            ReturnManagedName = GenParameter.GetParameterManagedCallName("res", info.ReturnParameter.ParameterType);
             ReturnNativeName = GenParameter.GetParameterNativeCallName(gc.Name, "res", info.ReturnParameter.ParameterType);
         }
     }

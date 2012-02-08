@@ -40,17 +40,17 @@ extern "C"
 ////////////////////// Constructors //////////////////////
 {% for con in c.Constructors -%}
 {{ c.Name }}CPP::{{ c.Name }}CPP({% parameters con.Parameters %}) 
-	: m_{{ c.Name }}(gcnew {{ c.Name }}({% parametersCall con.Parameters %})), 
-	{{ c.BaseName }}CPP(m_{{ c.Name }}) 
 {
+	m_{{ c.Name }} = gcnew {{ c.Name }}({% parametersCall con.Parameters %});
+	{{ c.BaseName }}CPP::SetInternal(m_{{ c.Name }});
 }
 {% endfor -%}
 
 {{ c.Name }}CPP::{{ c.Name }}CPP({{ c.Name }}^ _Internal) 
-	: m_{{ c.Name }}(_Internal), 
-	{{ c.BaseName }}CPP(m_{{ c.Name }}) 
 {
-}	
+	m_{{ c.Name }} = _Internal;
+	{{ c.BaseName }}CPP::SetInternal(m_{{ c.Name }});
+}
 
 ////////////////////// Propeties //////////////////////
 {% for prop in c.Properties -%}

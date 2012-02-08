@@ -1,0 +1,45 @@
+﻿//////////////////////////////////////////////////////////////////////////
+//
+//	This file is auto generated using C# to C++ Generator
+//	https://github.com/lodle/CSharp-To-Cpp-Cli
+//
+//////////////////////////////////////////////////////////////////////////
+
+#include <windows.h>
+
+static char g_szCurrentDir[255] = {0};
+
+//This resolves C# dll's to the current working dir
+class HookAppResolver
+{
+public:
+	HookAppResolver()
+	{
+		GetCurrentDirectoryA(255, g_szCurrentDir);
+
+		System::AppDomain^ currentDomain = System::AppDomain::CurrentDomain;
+		currentDomain->AssemblyResolve += gcnew System::ResolveEventHandler(MyResolveEventHandler);
+	}
+
+	static System::Reflection::Assembly^ MyResolveEventHandler(System::Object^ sender, System::ResolveEventArgs^ args)
+	{
+		for each(System::String^ file in System::IO::Directory::GetFiles(gcnew System::String(g_szCurrentDir), "*.dll"))
+		{
+			try
+			{
+				System::Reflection::Assembly^ assembly = System::Reflection::Assembly::LoadFile(file);
+
+				if (assembly->FullName == args->Name)
+					return assembly;
+			}
+			catch (System::Exception^ e)
+			{
+			}
+		}
+
+		return nullptr;
+	}
+};
+
+static HookAppResolver g_HookAppResolver;
+

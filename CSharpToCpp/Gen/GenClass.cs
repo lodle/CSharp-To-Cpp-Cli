@@ -68,24 +68,53 @@ namespace CSharpToCpp.Gen
             }
 
             foreach (var con in type.GetConstructors(BindingFlags.Public | BindingFlags.Instance))
+            {
+                if (ShouldSkip(con.GetCustomAttributes(true)))
+                    continue;
+
                 Constructors.Add(new GenConstructor(this, con));
+            }
 
             foreach (var function in type.GetMethods(BindingFlags.Public | BindingFlags.Instance))
             {
+                if (ShouldSkip(function.GetCustomAttributes(true)))
+                    continue;
+
                 if (!ShouldFilterFunction(function.Name))
                     Functions.Add(new GenFunction(this, function));
             }
 
             foreach (var function in type.GetMethods(BindingFlags.Public | BindingFlags.Static))
+            {
+                if (ShouldSkip(function.GetCustomAttributes(true)))
+                    continue;
+
                 StaticFunctions.Add(new GenFunction(this, function));
+            }
 
             foreach (var prop in type.GetProperties())
+            {
+                if (ShouldSkip(prop.GetCustomAttributes(true)))
+                    continue;
+
                 Properties.Add(new GenProperty(this, prop));
+            }
+        }
+
+        public static bool ShouldSkip(object[] atts)
+        {
+            foreach (var at in atts)
+            {
+                if (at is SkipCppAttribute)
+                    return true;
+            }
+
+            return false;
         }
 
         public static bool ShouldFilterFunction(String name)
         {
-            if (name.StartsWith("get_") || name.StartsWith("set_"))
+            if (name.StartsWith("get_") || name.StartsWith("set_") || name.StartsWith("add_") || name.StartsWith("remove_"))
                 return true;
 
             if (name == "ToString")
@@ -100,6 +129,9 @@ namespace CSharpToCpp.Gen
             if (name == "GetType")
                 return true;
 
+            if (name == "Invoke")
+                return true;
+
             return false;
         }
 
@@ -112,6 +144,9 @@ namespace CSharpToCpp.Gen
 
             foreach (var constructor in type.GetConstructors(BindingFlags.Public | BindingFlags.Instance))
             {
+                if (ShouldSkip(constructor.GetCustomAttributes(true)))
+                    continue;
+
                 foreach (var param in constructor.GetParameters())
                 {
                     if ((param.ParameterType.IsClass || param.ParameterType.IsInterface) && param.ParameterType != typeof(String))
@@ -121,6 +156,9 @@ namespace CSharpToCpp.Gen
 
             foreach (var function in type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static))
             {
+                if (ShouldSkip(function.GetCustomAttributes(true)))
+                    continue;
+
                 if (ShouldFilterFunction(function.Name))
                     continue;
 

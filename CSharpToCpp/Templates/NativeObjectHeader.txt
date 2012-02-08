@@ -17,7 +17,7 @@
 class NativeObjectCPP : public NativeObjectI
 {
 public:
-	NativeObjectCPP(System::Object^ _Internal)
+	void SetInternal(System::Object^ _Internal)
 	{
 		m_Object = _Internal;
 	}		

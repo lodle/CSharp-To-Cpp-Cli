@@ -54,22 +54,27 @@ class C{{ c.Name }} : public C{{ c.BaseName }}
 public:
 	//! Constructors
 {% for con in c.Constructors -%}
-	C{{ c.Name }}({% parameters con.Parameters %}) : 
-		m_pInterface(New{{ con.NameUnique }}({% parametersCall con.Parameters NativeToNative %})), 
-		C{{ c.BaseName }}(m_pInterface)
+	C{{ c.Name }}({% parameters con.Parameters %})
 	{
+		m_pInterface = New{{ con.NameUnique }}({% parametersCall con.Parameters NativeToNative %});
+		C{{ c.BaseName }}::SetInterface(m_pInterface);
 	}
 
 {% endfor -%}
-	C{{ c.Name }}({{ c.Name }}I* pInterface) :
-		m_pInterface(pInterface), 
-		C{{ c.BaseName }}(m_pInterface)
+	C{{ c.Name }}({{ c.Name }}I* pInterface)
 	{
+		m_pInterface = pInterface;
+		C{{ c.BaseName }}::SetInterface(m_pInterface);
 	}
 
 	~C{{ c.Name }}()
 	{
 		m_pInterface->Destroy();
+	}
+
+	void SetInterface({{ c.Name }}I* pInterface)
+	{
+		m_pInterface = pInterface;
 	}
 
 	operator {{ c.Name }}I*()

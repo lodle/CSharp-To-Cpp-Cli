@@ -43,15 +43,15 @@ namespace CSharpToCpp.Gen
             if (gc.Type.IsInterface)
                 CallName = GetParameterNativeCallName(gc.Name, Name, info.ParameterType);
             else
-                CallName = GetParameterManagedCallName(gc.Name, Name, info.ParameterType);
+                CallName = GetParameterManagedCallName(Name, info.ParameterType);
         }
 
-        static public string GetParameterManagedCallName(String className, String paramName, Type paramType)
+        static public string GetParameterManagedCallName(String paramName, Type paramType)
         {
             if (paramType == typeof(String))
                 return String.Format("gcnew System::String(std::string(_sz{0}Buff, _n{0}Size).c_str())", paramName);
             else if (paramType.IsClass)
-                return String.Format("(({0}*)_{1})->InternalObject()", paramName, className);
+                return String.Format("dynamic_cast<{0}CPP*>(_{1})->InternalObject()", paramType.Name, paramName);
             else if (paramType.IsInterface)
                 return String.Format("gcnew {0}ProxyCPP(_{1})", paramType.Name, paramName);
 

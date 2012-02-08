@@ -8,8 +8,10 @@ namespace CSharpToCpp
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface)]
     public class ExposeToCppAttribute : Attribute
     {
-        public ExposeToCppAttribute()
-        {
-        }
+    }
+
+    [AttributeUsage(AttributeTargets.All)]
+    public class SkipCppAttribute : Attribute
+    {
     }
 }

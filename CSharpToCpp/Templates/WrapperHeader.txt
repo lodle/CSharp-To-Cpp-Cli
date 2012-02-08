@@ -50,6 +50,12 @@ public:
 		return m_{{ c.Name }};
 	}
 
+	void SetInternal({{ c.Name }}^ _Internal)
+	{
+		m_{{ c.Name }} = _Internal;
+		{{ c.BaseName }}CPP::SetInternal(_Internal);
+	}	
+
 	virtual void Destroy()
 	{
 		delete this;
@@ -79,7 +85,6 @@ public:
 	{
 		{{ c.BaseName }}CPP::GetLastError(szBuff, nBuffSize);
 	}
-
 
 private:
 	msclr::gcroot<{{ c.Name }}^> m_{{ c.Name }};
