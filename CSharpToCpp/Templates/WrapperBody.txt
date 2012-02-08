@@ -94,7 +94,8 @@ void {{ c.Name }}CPP::{{ fun.Name }}(char* szRetBuff, int nRetBuffSize, {% param
 	try
 	{
 {% if fun.IsStringReturn -%}
-		std::string szRet = m_pInterface->{{ fun.Name }}(szBuff, 255, {% parametersCall fun.Parameters NativeToManaged %});
+		System::String^ mRet = m_{{ c.Name }}->{{ fun.Name }}({% parametersCall fun.Parameters NativeToManaged %});
+		std::string szRet = msclr::interop::marshal_as<std::string>(mRet);
 		strncpy_s(szRetBuff, nRetBuffSize, szRet.c_str(), szRet.size());
 {% elseif fun.IsVoidReturn == false -%}
 		{{ fun.ReturnManagedType }} _res = m_{{ c.Name }}->{{ fun.Name }}({% parametersCall fun.Parameters NativeToManaged %});

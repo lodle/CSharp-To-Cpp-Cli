@@ -42,7 +42,11 @@ public:
 
 	//! Methods
 {% for fun in c.Functions -%}
+{% if fun.IsStringReturn == true -%}
+	virtual void {{ fun.Name }}(char* szBuff, int nBuffSize, {% parameters fun.Parameters NativeToManaged %});
+{% else -%}
 	virtual {{ fun.ReturnNativeType }} {{ fun.Name }}({% parameters fun.Parameters NativeToManaged %});
+{% endif -%}
 {% endfor -%}
 
 	{{ c.Name }}^ InternalObject()
