@@ -18,7 +18,7 @@ public:
 	//! Properties
 {% for prop in c.Properties -%}
 {% if prop.IsString == true -%}
-	virtual void Get{{ prop.Name }}(char* szBuff, int nBuffSize)=0;
+	virtual NativeStringI* Get{{ prop.Name }}()=0;
 	virtual void Set{{ prop.Name }}(const char* szBuff, int nBuffSize)=0;
 {% else %}
 	virtual {{ prop.NativeType }} Get{{ prop.Name }}()=0;
@@ -29,7 +29,7 @@ public:
 	//! Methods
 {% for fun in c.Functions -%}
 {% if fun.IsStringReturn == true -%}
-	virtual void {{ fun.Name }}(char* szBuff, int nBuffSize, {% parameters fun.Parameters NativeToManaged %})=0;
+	virtual NativeStringI* {{ fun.Name }}({% parameters fun.Parameters NativeToManaged %})=0;
 {% else -%}
 	virtual {{ fun.ReturnNativeType }} {{ fun.Name }}({% parameters fun.Parameters NativeToManaged %})=0;
 {% endif -%}
@@ -73,7 +73,8 @@ public:
 
 	~C{{ c.Name }}()
 	{
-		m_pInterface->Destroy();
+		if (m_pInterface)
+			m_pInterface->Destroy();
 	}
 
 	void SetInterface({{ c.Name }}I* pInterface)
@@ -91,9 +92,10 @@ public:
 	static {{ fun.ReturnNativeType }} {{ fun.Name }}({% parameters fun.Parameters %})
 	{
 {% if fun.IsStringReturn -%}
-		char szBuff[255] = {0};
-		m_pInterface->{{ fun.Name }}(szBuff, 255, {% parametersCall fun.Parameters NativeToNative %});
-		return std::string(szBuff);
+		NativeStringI *str = m_pInterface->{{ fun.Name }}({% parametersCall fun.Parameters NativeToNative %});
+		std::string ret(str->GetBuffer());
+		str->Destroy();
+		return ret;
 {% elseif fun.IsVoidReturn == false -%}
 		{{ fun.ReturnNativeType }} _res = {{ fun.NameUnique }}({% parametersCall fun.Parameters NativeToNative %});
 		return {{ fun.ReturnNativeName }};
@@ -108,9 +110,10 @@ public:
 {% if prop.IsString == true -%}
 	virtual {{ prop.NativeType }} Get{{ prop.Name }}()
 	{
-		char szBuff[255] = {0};
-		m_pInterface->Get{{ prop.Name }}(szBuff, 255);
-		return std::string(szBuff);
+		NativeStringI *str = m_pInterface->Get{{ prop.Name }}();
+		std::string ret(str->GetBuffer());
+		str->Destroy();
+		return ret;
 	}
 
 	virtual void Set{{ prop.Name }}({{ prop.NativeType }} _Value)
@@ -135,23 +138,24 @@ public:
 	virtual {{ fun.ReturnNativeType }} {{ fun.Name }}({% parameters fun.Parameters %})
 	{
 {% if fun.IsStringReturn -%}
-		char szBuff[255] = {0};
-		m_pInterface->{{ fun.Name }}(szBuff, 255, {% parametersCall fun.Parameters NativeToNative %});
+		NativeStringI *str = m_pInterface->{{ fun.Name }}({% parametersCall fun.Parameters NativeToNative %});
+		std::string _res(str->GetBuffer());
+		str->Destroy();
 {% elseif fun.IsVoidReturn == false -%}
 		{{ fun.ReturnNativeType }} _res = m_pInterface->{{ fun.Name }}({% parametersCall fun.Parameters NativeToNative %});
 {% else -%}
 		m_pInterface->{{ fun.Name }}({% parametersCall fun.Parameters NativeToNative %});
 {% endif -%}
+
 		CheckForError();
-{% if fun.IsStringReturn -%}
-		return std::string(szBuff);
-{% elseif fun.IsVoidReturn == false -%}
+
+{% if fun.IsVoidReturn == false -%}
 		return _res;
 {% endif -%}
 	}
 
 {% endfor -%}
-private:
+protected:
 	{{ c.Name }}I* m_pInterface;
 };
 

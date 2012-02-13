@@ -32,7 +32,7 @@ public:
 	//! Properties
 {% for prop in c.Properties -%}
 {% if prop.IsString == true -%}
-	virtual void Get{{ prop.Name }}(char* szBuff, int nBuffSize);
+	virtual NativeStringI* Get{{ prop.Name }}();
 	virtual void Set{{ prop.Name }}(const char* szBuff, int nBuffSize);
 {% else %}
 	virtual {{ prop.NativeType }} Get{{ prop.Name }}();
@@ -43,7 +43,7 @@ public:
 	//! Methods
 {% for fun in c.Functions -%}
 {% if fun.IsStringReturn == true -%}
-	virtual void {{ fun.Name }}(char* szBuff, int nBuffSize, {% parameters fun.Parameters NativeToManaged %});
+	virtual NativeStringI* {{ fun.Name }}({% parameters fun.Parameters NativeToManaged %});
 {% else -%}
 	virtual {{ fun.ReturnNativeType }} {{ fun.Name }}({% parameters fun.Parameters NativeToManaged %});
 {% endif -%}

@@ -14,6 +14,32 @@
 #include <msclr\marshal.h>
 #include <msclr\marshal_cppstd.h>
 
+class NativeStringCPP : public NativeStringI
+{
+public:
+	NativeStringCPP(System::String^ string)
+	{
+		m_strString = msclr::interop::marshal_as<std::string>(string);
+	}
+
+	virtual const char* GetBuffer()
+	{
+		return m_strString.c_str();
+	}
+
+	virtual size_t GetSize()
+	{
+		return m_strString.size();
+	}
+
+	virtual void Destroy()
+	{
+		delete this;
+	}
+
+	std::string m_strString;
+};
+
 class NativeObjectCPP : public NativeObjectI
 {
 public:

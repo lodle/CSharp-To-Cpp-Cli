@@ -55,11 +55,9 @@ extern "C"
 ////////////////////// Propeties //////////////////////
 {% for prop in c.Properties -%}
 {% if prop.IsString == true -%}
-void {{ c.Name }}CPP::Get{{ prop.Name }}(char* szBuff, int nBuffSize)
+NativeStringI* {{ c.Name }}CPP::Get{{ prop.Name }}()
 {
-	{{ prop.ReturnManagedType }} _res = m_{{ c.Name }}->{{ prop.Name }};
-	std::string szRes = {{ prop.ReturnNativeName }};
-	strncpy_s(szBuff, nBuffSize, szRes.c_str(), szRes.size());
+	return new NativeStringCPP( m_{{ c.Name }}->{{ prop.Name }} );
 }
 
 void {{ c.Name }}CPP::Set{{ prop.Name }}(const char* _szValueBuff, int _nValueSize)
@@ -84,7 +82,7 @@ void {{ c.Name }}CPP::Set{{ prop.Name }}({{ prop.NativeType }} _Value)
 ////////////////////// Functions //////////////////////
 {% for fun in c.Functions -%}
 {% if fun.IsStringReturn -%}
-void {{ c.Name }}CPP::{{ fun.Name }}(char* szRetBuff, int nRetBuffSize, {% parameters fun.Parameters NativeToManaged %})
+NativeStringI* {{ c.Name }}CPP::{{ fun.Name }}({% parameters fun.Parameters NativeToManaged %})
 {% else -%}
 {{ fun.ReturnNativeType }} {{ c.Name }}CPP::{{ fun.Name }}({% parameters fun.Parameters NativeToManaged %})
 {% endif -%}
@@ -94,9 +92,7 @@ void {{ c.Name }}CPP::{{ fun.Name }}(char* szRetBuff, int nRetBuffSize, {% param
 	try
 	{
 {% if fun.IsStringReturn -%}
-		System::String^ mRet = m_{{ c.Name }}->{{ fun.Name }}({% parametersCall fun.Parameters NativeToManaged %});
-		std::string szRet = msclr::interop::marshal_as<std::string>(mRet);
-		strncpy_s(szRetBuff, nRetBuffSize, szRet.c_str(), szRet.size());
+		return new NativeStringCPP(m_{{ c.Name }}->{{ fun.Name }}({% parametersCall fun.Parameters NativeToManaged %}));
 {% elseif fun.IsVoidReturn == false -%}
 		{{ fun.ReturnManagedType }} _res = m_{{ c.Name }}->{{ fun.Name }}({% parametersCall fun.Parameters NativeToManaged %});
 		return {{ fun.ReturnNativeName }};
