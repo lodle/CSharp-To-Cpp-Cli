@@ -71,7 +71,7 @@ public:
 		C{{ c.BaseName }}::SetInterface(m_pInterface);
 	}
 
-	~C{{ c.Name }}()
+	virtual ~C{{ c.Name }}()
 	{
 		if (m_pInterface)
 			m_pInterface->Destroy();

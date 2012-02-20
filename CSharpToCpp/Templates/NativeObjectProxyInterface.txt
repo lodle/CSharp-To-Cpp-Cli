@@ -37,6 +37,10 @@ public:
 	virtual std::string DoToString()=0;
 	virtual int DoGetHashCode()=0;
 
+	virtual ~CNativeObjectProxy()
+	{
+	}
+
 protected:
 	virtual bool HasError()
 	{

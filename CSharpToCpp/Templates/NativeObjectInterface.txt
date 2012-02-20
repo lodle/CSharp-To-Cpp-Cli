@@ -43,6 +43,10 @@ public:
 class CNativeObject
 {
 public:
+	virtual ~CNativeObject()
+	{
+	}
+
 	void SetInterface(NativeObjectI* pObject)
 	{
 		m_pObject = pObject;

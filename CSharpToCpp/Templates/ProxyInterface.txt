@@ -33,6 +33,8 @@ public:
 	virtual {{ fun.ReturnNativeType }} Do{{ fun.Name }}({% parameters fun.Parameters NativeExternal %})=0;
 {% endfor %}
 
+	virtual ~C{{ c.Name }}(){}
+
 protected:
 {% for fun in c.Functions -%}
 {% if fun.IsStringReturn -%}
