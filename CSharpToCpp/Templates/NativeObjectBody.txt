@@ -32,7 +32,7 @@ public:
 				if (assembly->FullName == args->Name)
 					return assembly;
 			}
-			catch (System::Exception^ e)
+			catch (System::Exception^)
 			{
 			}
 		}
