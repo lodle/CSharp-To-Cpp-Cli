@@ -60,7 +60,7 @@ NativeStringI* {{ c.Name }}CPP::Get{{ prop.Name }}()
 	return new NativeStringCPP( m_{{ c.Name }}->{{ prop.Name }} );
 }
 
-void {{ c.Name }}CPP::Set{{ prop.Name }}(const char* _szValueBuff, int _nValueSize)
+void {{ c.Name }}CPP::Set{{ prop.Name }}(const char* _szValueBuff, size_t _nValueSize)
 {
 	m_{{ c.Name }}->{{ prop.Name }} = {{ prop.SetManagedName }};
 }
@@ -102,7 +102,12 @@ NativeStringI* {{ c.Name }}CPP::{{ fun.Name }}({% parameters fun.Parameters Nati
 	}
 	catch (System::Exception^ e)
 	{
-		m_szLastError = msclr::interop::marshal_as<std::string>(e->Message);	
+		m_szLastError = msclr::interop::marshal_as<std::string>(e->Message);
+{% if fun.IsStringReturn -%}
+		return NULL;
+{% elseif fun.IsVoidReturn == false -%}
+		return {{ fun.ReturnNativeDefault }};
+{% endif -%}
 	}
 }
 

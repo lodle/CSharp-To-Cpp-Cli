@@ -31,13 +31,13 @@ class NativeObjectI
 public:
 	virtual void Destroy()=0;
 
-	virtual void ToString(char* szBuff, int nBuffSize)=0;
+	virtual void ToString(char* szBuff, size_t nBuffSize)=0;
 	virtual int GetHashCode()=0;
 
 	virtual bool Equals(NativeObjectI* pObject)=0;
 
 	virtual bool HasError()=0;
-	virtual void GetLastError(char* szBuff, int nBuffSize)=0;
+	virtual void GetLastError(char* szBuff, size_t nBuffSize)=0;
 };
 
 class CNativeObject

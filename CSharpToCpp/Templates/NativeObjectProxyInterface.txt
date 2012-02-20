@@ -23,11 +23,11 @@ class NativeObjectProxyI
 public:
 	virtual void Destroy()=0;
 
-	virtual void ToString(char* szBuff, int nBuffSize)=0;
+	virtual void ToString(char* szBuff, size_t nBuffSize)=0;
 	virtual int GetHashCode()=0;
 
 	virtual bool HasError()=0;
-	virtual void GetLastError(char* szBuff, int nBuffSize)=0;
+	virtual void GetLastError(char* szBuff, size_t nBuffSize)=0;
 };
 
 class CNativeObjectProxy : public virtual NativeObjectProxyI
@@ -43,7 +43,7 @@ protected:
 		return m_szLastError.size() > 0;
 	}
 
-	virtual void GetLastError(char* szBuff, int nBuffSize)
+	virtual void GetLastError(char* szBuff, size_t nBuffSize)
 	{
 		strncpy_s(szBuff, nBuffSize, m_szLastError.c_str(), m_szLastError.size());
 	}
@@ -53,7 +53,7 @@ protected:
 		DoDestroy();
 	}
 
-	virtual void ToString(char* szBuff, int nBuffSize)
+	virtual void ToString(char* szBuff, size_t nBuffSize)
 	{
 		std::string res = DoToString();
 		strncpy_s(szBuff, nBuffSize, res.c_str(), res.size());

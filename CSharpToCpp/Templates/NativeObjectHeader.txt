@@ -48,7 +48,7 @@ public:
 		m_Object = _Internal;
 	}		
 
-	virtual void ToString(char* szBuff, int nBuffSize)
+	virtual void ToString(char* szBuff, size_t nBuffSize)
 	{
 		std::string szRes = msclr::interop::marshal_as<std::string>(m_Object->ToString());
 		strncpy_s(szBuff, nBuffSize, szRes.c_str(), szRes.size());
@@ -79,7 +79,7 @@ public:
 		return m_szLastError.size() > 0;
 	}
 
-	virtual void GetLastError(char* szBuff, int nBuffSize)
+	virtual void GetLastError(char* szBuff, size_t nBuffSize)
 	{
 		strncpy_s(szBuff, nBuffSize, m_szLastError.c_str(), m_szLastError.size());
 	}

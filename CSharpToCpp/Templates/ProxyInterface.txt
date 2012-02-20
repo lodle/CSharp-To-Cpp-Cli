@@ -18,7 +18,7 @@ public:
 	//! Methods
 {% for fun in c.Functions -%}
 {% if fun.IsStringReturn -%}
-	virtual void {{ fun.Name }}(char* szRetBuff, int nRetBuffSize, {% parameters fun.Parameters NativeInternal %})=0;
+	virtual void {{ fun.Name }}(char* szRetBuff, size_t nRetBuffSize, {% parameters fun.Parameters NativeInternal %})=0;
 {% else -%}
 	virtual {{ fun.ReturnNativeType }} {{ fun.Name }}({% parameters fun.Parameters NativeInternal %})=0;
 {% endif -%}
@@ -36,7 +36,7 @@ public:
 protected:
 {% for fun in c.Functions -%}
 {% if fun.IsStringReturn -%}
-	virtual void {{ fun.Name }}(char* szRetBuff, int nRetBuffSize, {% parameters fun.Parameters NativeInternal %})
+	virtual void {{ fun.Name }}(char* szRetBuff, size_t nRetBuffSize, {% parameters fun.Parameters NativeInternal %})
 {% else -%}
 	virtual {{ fun.ReturnNativeType }} {{ fun.Name }}({% parameters fun.Parameters NativeInternal %})
 {% endif -%}
@@ -58,6 +58,9 @@ protected:
 		catch (std::exception &e)
 		{
 			m_szLastError = e.what();
+{% if fun.IsVoidReturn == false -%}
+			return {{ fun.ReturnNativeDefault }};
+{% endif -%}
 		}
 	}
 
@@ -68,7 +71,7 @@ protected:
 		return C{{ c.BaseName }}::HasError();
 	}
 
-	virtual void GetLastError(char* szBuff, int nBuffSize)
+	virtual void GetLastError(char* szBuff, size_t nBuffSize)
 	{
 		C{{ c.BaseName }}::GetLastError(szBuff, nBuffSize);
 	}
@@ -78,7 +81,7 @@ protected:
 		C{{ c.BaseName }}::Destroy();
 	}
 
-	virtual void ToString(char* szBuff, int nBuffSize)
+	virtual void ToString(char* szBuff, size_t nBuffSize)
 	{
 		C{{ c.BaseName }}::ToString(szBuff, nBuffSize);
 	}

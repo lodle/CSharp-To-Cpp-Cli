@@ -52,7 +52,7 @@ namespace CSharpToCpp
                 if (IsNativeToManaged || IsNativeInternal)
                 {
                     if (p.Type == typeof(String))
-                        result.Write("const char* _sz{0}Buff, int _n{0}Size", p.Name);
+                        result.Write("const char* _sz{0}Buff, size_t _n{0}Size", p.Name);
                     else
                         result.Write("{0} _{1}", p.NativeType, p.Name);
                 }

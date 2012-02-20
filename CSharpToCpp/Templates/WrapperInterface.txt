@@ -19,7 +19,7 @@ public:
 {% for prop in c.Properties -%}
 {% if prop.IsString == true -%}
 	virtual NativeStringI* Get{{ prop.Name }}()=0;
-	virtual void Set{{ prop.Name }}(const char* szBuff, int nBuffSize)=0;
+	virtual void Set{{ prop.Name }}(const char* szBuff, size_t nBuffSize)=0;
 {% else %}
 	virtual {{ prop.NativeType }} Get{{ prop.Name }}()=0;
 	virtual void Set{{ prop.Name }}({{ prop.NativeType }} _Value)=0;

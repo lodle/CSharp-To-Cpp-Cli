@@ -33,7 +33,7 @@ public:
 {% for prop in c.Properties -%}
 {% if prop.IsString == true -%}
 	virtual NativeStringI* Get{{ prop.Name }}();
-	virtual void Set{{ prop.Name }}(const char* szBuff, int nBuffSize);
+	virtual void Set{{ prop.Name }}(const char* szBuff, size_t nBuffSize);
 {% else %}
 	virtual {{ prop.NativeType }} Get{{ prop.Name }}();
 	virtual void Set{{ prop.Name }}({{ prop.NativeType }} _Value);
@@ -70,7 +70,7 @@ public:
 		return {{ c.BaseName }}CPP::GetHashCode();
 	}
 	
-	virtual void ToString(char* szBuff, int nBuffSize)
+	virtual void ToString(char* szBuff, size_t nBuffSize)
 	{
 		return {{ c.BaseName }}CPP::ToString(szBuff, nBuffSize);
 	}
@@ -85,7 +85,7 @@ public:
 		return {{ c.BaseName }}CPP::HasError();
 	}
 
-	virtual void GetLastError(char* szBuff, int nBuffSize)
+	virtual void GetLastError(char* szBuff, size_t nBuffSize)
 	{
 		{{ c.BaseName }}CPP::GetLastError(szBuff, nBuffSize);
 	}

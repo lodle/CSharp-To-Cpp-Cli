@@ -16,6 +16,9 @@ namespace CSharpToCpp.Gen
         public String ReturnManagedName;
         public String ReturnNativeName;
 
+        public String ReturnManagedDefault;
+        public String ReturnNativeDefault;
+
         public String NameUnique;
 
         public bool IsVoidReturn;
@@ -34,6 +37,9 @@ namespace CSharpToCpp.Gen
                 ReturnManagedType = ReturnManagedType,
                 ReturnManagedName = ReturnManagedName,
                 ReturnNativeName = ReturnNativeName,
+
+                ReturnManagedDefault = ReturnManagedDefault,
+                ReturnNativeDefault = ReturnNativeDefault,
 
                 NameUnique = NameUnique,
                 Parameters = Parameters
@@ -66,6 +72,89 @@ namespace CSharpToCpp.Gen
 
             ReturnManagedName = GenParameter.GetParameterManagedCallName("res", info.ReturnParameter.ParameterType);
             ReturnNativeName = GenParameter.GetParameterNativeCallName(gc.Name, "res", info.ReturnParameter.ParameterType);
+
+            ReturnManagedDefault = GetManagedDefault(info.ReturnParameter.ParameterType);
+            ReturnNativeDefault = GetNativeDefault(info.ReturnParameter.ParameterType);
+        }
+
+        static public String GetNativeDefault(Type parameterType)
+        {
+            if (parameterType == typeof(String))
+            {
+                return "std::string()";
+            }
+            else if (parameterType == typeof(Int32))
+            {
+                return "0";
+            }
+            else if (parameterType == typeof(Double))
+            {
+                return "0";
+            }
+            else if (parameterType == typeof(Boolean))
+            {
+                return "false";
+            }
+            else if (parameterType == typeof(Object))
+            {
+                return "NULL";
+            }
+            else if (parameterType.ContainsGenericParameters)
+            {
+                int a = 1;
+            }
+            else if (parameterType.IsClass)
+            {
+                return "NULL";
+            }
+            else if (parameterType.IsInterface)
+            {
+                return "NULL";
+            }
+            else if (parameterType == typeof(void))
+            {
+                return "";
+            }
+
+            return "[FAIL]";
+        }
+
+        static public String GetManagedDefault(Type parameterType)
+        {
+            if (parameterType == typeof(String))
+            {
+                return "\"\"";
+            }
+            else if (parameterType == typeof(Int32))
+            {
+                return "0";
+            }
+            else if (parameterType == typeof(Double))
+            {
+                return "0";
+            }
+            else if (parameterType == typeof(Boolean))
+            {
+                return "false";
+            }
+            else if (parameterType == typeof(Object))
+            {
+                return "null";
+            }
+            else if (parameterType.ContainsGenericParameters)
+            {
+                int a = 1;
+            }
+            else if (parameterType.IsClass || parameterType.IsInterface)
+            {
+                return "null";
+            }
+            else if (parameterType == typeof(void))
+            {
+                return "";
+            }
+
+            return "[FAIL]";
         }
     }
 }
