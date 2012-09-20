@@ -49,10 +49,15 @@ public:
 
 	std::string GetLastError()
 	{
-		char szError[255] = {0};
-		m_Object->GetLastError(szError, 255);
+		int nSize = m_Object->GetLastError(NULL, 0);
 
-		return std::string(szError, 255);
+		char* szError = new char[nSize];
+		m_Object->GetLastError(szError, nSize);
+
+		std::string ret(szError, nSize);
+		delete [] szError;
+
+		return ret;
 	}
 
 private:

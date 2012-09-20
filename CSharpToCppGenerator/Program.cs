@@ -27,6 +27,8 @@ namespace CSharpToCppGenerator
             {
                 gen.Generate(type);
             }
+
+			gen.GenerateCombinedFile();
         }
     }
 }

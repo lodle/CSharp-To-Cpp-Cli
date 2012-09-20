@@ -73,9 +73,9 @@ protected:
 		return C{{ c.BaseName }}::HasError();
 	}
 
-	virtual void GetLastError(char* szBuff, size_t nBuffSize)
+	virtual int GetLastError(char* szBuff, size_t nBuffSize)
 	{
-		C{{ c.BaseName }}::GetLastError(szBuff, nBuffSize);
+		return C{{ c.BaseName }}::GetLastError(szBuff, nBuffSize);
 	}
 
 	virtual void Destroy()

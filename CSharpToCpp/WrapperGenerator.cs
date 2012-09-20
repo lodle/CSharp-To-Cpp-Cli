@@ -17,6 +17,8 @@ namespace CSharpToCpp
         Dictionary<Type, GenClass> _GeneratedList = new Dictionary<Type, GenClass>();
         Dictionary<String, Template> _TemplateList = new Dictionary<string, Template>();
 
+		List<String> _BuildFiles = new List<String>();
+
         public WrapperGenerator(string outPath, string lib)
         {
             OutPath = outPath;
@@ -89,6 +91,8 @@ namespace CSharpToCpp
             {
                 outFile.Write(output);
             }
+
+			_BuildFiles.Add(outPath);
         }
 
         public IEnumerable<Type> GetTypesWith<TAttribute>() where TAttribute : System.Attribute
@@ -96,6 +100,23 @@ namespace CSharpToCpp
             return from t in Assembly.LoadFrom(DynamicLib).GetTypes()
                    where t.IsDefined(typeof(TAttribute), false)
                    select t;
-        }   
-    }
+        }
+
+		public void GenerateCombinedFile()
+		{
+			var outPath = OutPath + "\\GeneratedBuild.cpp";
+			var lines = new List<String>();
+
+			foreach (var output in _BuildFiles)
+				lines.Add("#include \"" + Path.GetFileName(Path.GetDirectoryName(output)) + "\\" + Path.GetFileName(output) + "\"\n");
+
+			if (File.Exists(outPath))
+			{
+				File.SetAttributes(outPath, File.GetAttributes(outPath) & ~FileAttributes.ReadOnly);
+				File.Delete(outPath);
+			}
+
+			File.WriteAllLines(outPath, lines.ToArray());
+		}
+	}
 }

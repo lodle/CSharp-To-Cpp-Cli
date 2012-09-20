@@ -79,9 +79,18 @@ public:
 		return m_szLastError.size() > 0;
 	}
 
-	virtual void GetLastError(char* szBuff, size_t nBuffSize)
+	virtual int GetLastError(char* szBuff, size_t nBuffSize)
 	{
-		strncpy_s(szBuff, nBuffSize, m_szLastError.c_str(), m_szLastError.size());
+		if (szBuff == NULL)
+			return (int)m_szLastError.size()+1;
+
+		size_t nCopySize = m_szLastError.size();
+
+		if (nBuffSize < nCopySize)
+			nCopySize = nBuffSize-1;
+
+		strncpy_s(szBuff, nBuffSize, m_szLastError.c_str(), nCopySize);
+		return (int)nCopySize;
 	}
 
 protected:
